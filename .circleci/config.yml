@@ -1,0 +1,32 @@
+# Python CircleCI 2.0 configuration file
+version: 2
+jobs:
+  build:
+    docker:
+      - image: reaper99/unicorn:latest
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - run:
+          name: Install Python dependencies
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      - run:
+          name: Install Node modules
+          command: yarn install --frozen-lockfile --modules-folder ./app/frontend/node_modules
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            flask lint
+            flask test
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build

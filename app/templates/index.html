@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block page_content %}
+<section>
+  <div id="live-chart__container">
+    <canvas id="live-chart"></canvas>
+  </div>
+</section>
+<script>
+  var liveChart = null;
+  window.onload = () => {
+    let temperatures = [];
+    let humidities = [];
+
+    {% for sample in samples %}
+    temperatures.push({'x': new Date('{{ sample.date }}'), 'y': {{ sample.temperature }}})
+    humidities.push({'x': new Date('{{ sample.date }}'), 'y': {{ sample.humidity }}})
+    {% endfor %}
+
+    liveChart = new LiveChart(temperatures, humidities)
+    liveChart.create()
+  }
+</script>
+{% endblock %}
