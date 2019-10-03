@@ -1,3 +1,10 @@
+.env
+*.sqlite
+app/static/gen
+app/frontend/node_modules
+.backup/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
