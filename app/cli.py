@@ -18,6 +18,8 @@ def test():
     """Execute all tests."""
     # add --ignore=tests/__init__.py later
     execute(['pytest -vv --cov=.'], 'test all')
+    commands = ['pip install alembic cssmin flask-assets jsmin mysqlclient sqlalchemy webassets']
+    execute(commands, 'pip install removed packages')
 
 
 @click.command()

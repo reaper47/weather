@@ -1,0 +1,17 @@
+.sensor-data-container > p {
+  text-align: center;
+}
+
+.sensor-data {
+  margin-top: 1rem !important;
+  text-align: right;
+}
+
+#live-tile > article {
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+#live-tile > article:first-of-type {
+  margin-bottom: 0 !important;
+}

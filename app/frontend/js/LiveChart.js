@@ -42,7 +42,11 @@ class LiveChart {
           }
         },
         legend: {
-          position: 'top'
+          position: 'top',
+          labels: {
+            fontSize: 14,
+            fontColor: 'rgba(255, 255, 255, 0.7)'
+          }
         },
         maintainAspectRatio: false,
         scales: {
@@ -52,13 +56,17 @@ class LiveChart {
               display: true,
               labelString: 'Temperature (°C)',
               lineHeight: 2,
-              fontSize: 16
+              fontSize: 16,
+              fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
               beginAtZero: true,
+              fontColor: 'rgba(255, 255, 255, 0.7)',
+              maxTicksLimit: 20,
+              suggestedMax: 100,
             },
             gridLines: {
-              color: 'rgba(21, 21, 21, 0.1)',
+              color: 'rgba(255, 255, 255, 0.25)',
               lineWidth: 0.75
             },
             position: 'left'
@@ -71,13 +79,18 @@ class LiveChart {
               display: true,
               labelString: 'Humidity (%)',
               lineHeight: 2,
-              fontSize: 16
+              fontSize: 16,
+              fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
               beginAtZero: true,
+              fontColor: 'rgba(255, 255, 255, 0.7)',
+              maxTicksLimit: 20,
+              suggestedMax: 100,
             },
             gridLines: {
-              color: 'rgba(21, 21, 21, 0.1)',
+              color: 'rgba(255, 255, 255, 0.25)',
+              zeroLineColor: 'rgba(255, 255, 255, 0.25)',
               lineWidth: 0.75
             },
             position: 'right'
@@ -88,15 +101,27 @@ class LiveChart {
               min: new Date().setHours(0, 0, 0, 0),
               unit: 'hour'
             },
+            scaleLabel: {
+              display: true,
+            },
             gridLines: {
-              color: 'rgba(21, 21, 21, 0.1)',
-              lineWidth: 0.75
+              color: 'rgba(255, 255, 255, 0.2)',
+              lineWidth: 0.75,
+
+            },
+            ticks: {
+              fontColor: 'rgba(255, 255, 255, 0.7)'
             }
           }]
         },
         tooltips: {
           mode: 'label',
           intersect: false,
+          bodyFontSize: 14,
+          bodySpacing: 6,
+          titleFontSize: 14,
+          yPadding: 10,
+          xPadding: 10
         },
       },
       plugins: [{

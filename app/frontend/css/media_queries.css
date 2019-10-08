@@ -1,0 +1,54 @@
+@media screen and (max-width: 768px) {
+  html {
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+  
+  #live-chart__container {
+    width: 96vw;
+  }
+}
+
+@media (min-width: 769px) {
+.sensor-data-container > p:last-of-type {
+  position: absolute;
+  bottom: 1.75rem;
+  left: 1.1rem;
+}
+}
+
+@media (max-width: 1249px) {
+  .sensor-data-container > p:last-of-type {
+    font-size: 1.2rem;
+  }
+}​
+
+@media (max-width: 1500px) {
+  .sensor-data-container > p:last-of-type {
+    font-size: 1.5rem;
+  }
+}​
+
+@media (max-height: 760px) {
+  #live-chart__container {
+    height: 90vh;
+  }
+}
+
+@media (max-height: 600px) {
+  #live-chart__container {
+    height: 88vh;
+  }
+}
+
+@media (max-height: 500px) {
+  #live-chart__container {
+    height: 86vh;
+  }
+}
+
+@media (max-height: 400px) {
+  #live-chart__container {
+    height: 86vh;
+  }
+}

@@ -1,0 +1,2 @@
+gpio_ext.c:4:6:gpio_set_output	40	static
+gpio_ext.c:13:6:gpio_set_input	40	static

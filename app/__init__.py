@@ -3,11 +3,13 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_assets import Environment
+from flask_socketio import SocketIO
 from config import config
 
 db = SQLAlchemy()
 migrate = Migrate()
 assets = Environment()
+socketio = SocketIO()
 
 
 def create_app(config_name='default'):
@@ -15,7 +17,7 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    __register_extensions(app, [db, assets])
+    __register_extensions(app, [db, assets, socketio])
     __register_blueprints(app, ['live'])
 
     from app.utils.assets import bundles

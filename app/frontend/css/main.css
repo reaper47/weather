@@ -1,0 +1,11 @@
+html {
+  overflow: hidden !important;
+}
+
+.no-padding {
+  padding: 0 !important;
+}
+
+.navbar-burger span:nth-child(3) {
+  top: calc(30px);
+}

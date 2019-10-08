@@ -1,5 +1,7 @@
 from datetime import datetime
 from app import db
+from app.utils.database import commit
+from app.utils.dto import Sample
 
 
 class Station(db.Model):
@@ -35,3 +37,9 @@ def get_samples_for_day(date):
     day_start = f'{date.year}-{date.month}-{date.day} 00:00:00'
     day_end = f'{date.year}-{date.month}-{date.day} 23:59:59'
     return DHT.query.filter(DHT.date.between(day_start, day_end)).all()
+
+
+def add_new_sample(sample: Sample):
+    station = Station.query.filter_by(id=sample.station).first()
+    dht = DHT(station=station, temperature=sample.temperature, humidity=sample.humidity, date=sample.date)
+    commit(dht)

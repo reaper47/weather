@@ -1,3 +1,4 @@
+import json
 import pytest
 from app import create_app, db
 from app.models.sampling import Station, DHT
@@ -6,6 +7,9 @@ from app.utils.database import commit
 A_STATION_NAME = 'Home - Backyard'
 A_TEMPERATURE = 23.0
 A_HUMIDITY = 56.0
+
+A_JSON_SAMPLE = json.dumps({'temperature': 5, 'humidity': 56, 'station_id': 1})
+OTHER_JSON_SAMPLE = json.dumps({'temperature': 20, 'humidity': 30, 'station_id': 1})
 
 
 @pytest.fixture(scope='function')

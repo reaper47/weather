@@ -2,13 +2,37 @@
 
 {% block page_content %}
 <section>
-  <div id="live-chart__container">
-    <canvas id="live-chart"></canvas>
+  <div class="tile is-ancestor">
+    <div class="tile is-vertical">
+      <div class="tile">
+        <div id="live-tile" class="tile is-parent is-vertical no-padding">
+          <article class="tile is-child notification is-primary sensor-data-container">
+            <p id="live-temperature" class="title sensor-data">N/A</p>
+            <p class="title">Temperature</p>
+          </article>
+          <article class="tile is-child notification is-warning sensor-data-container">
+            <p id="live-humidity" class="title sensor-data">N/A</p>
+            <p class="title">Humidity</p>
+          </article>
+        </div>
+        <div class="tile is-parent is-10 no-padding">
+          <article class="tile is-child notification is-dark">
+            <div id="live-chart__container">
+              <canvas id="live-chart"></canvas>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 <script>
   var liveChart = null;
+  const liveTemperature = document.getElementById('live-temperature');
+  const liveHumidity = document.getElementById('live-humidity');
+
   window.onload = () => {
+    // Load the sensor data
     let temperatures = [];
     let humidities = [];
 
@@ -17,8 +41,20 @@
     humidities.push({'x': new Date('{{ sample.date }}'), 'y': {{ sample.humidity }}})
     {% endfor %}
 
+    // Create the Live chart
     liveChart = new LiveChart(temperatures, humidities)
     liveChart.create()
+
+    // Establish the sockets
+    const socket = io.connect('http://' + document.domain + ':' + location.port)
+    socket.on('update_graph', (sample) => {
+      liveChart.addDataPoint(new Date(sample['date']), sample['temperature'], sample['humidity'])
+    })
+
+    socket.on('update_live', (sample) => {
+      liveTemperature.textContent = `${sample.temperature}°C`;
+      liveHumidity.textContent = `${sample.humidity}%`;
+    })
   }
 </script>
 {% endblock %}

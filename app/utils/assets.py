@@ -6,6 +6,9 @@ NODE = '../frontend/node_modules'
 
 bundles = {
     'main_css': Bundle(f'{CSS}/LiveChart.css',
+                       f'{CSS}/live.css',
+                       f'{CSS}/main.css',
+                       f'{CSS}/media_queries.css',
                        f'{NODE}/bulma/css/bulma.min.css',
                        f'{NODE}/chart.js/dist/Chart.min.css',
                        filters='cssmin', output='gen/packed.css'),
