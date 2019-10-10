@@ -85,11 +85,11 @@ uint8_t ESP8266_check_wifi_connection();
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-#define SSID "Your wifi SSID"
-#define PASSWORD "Your wifi password"
-#define ADDRESS "192.168.0.172"
+#define SSID "YOUR WIFI"
+#define PASSWORD "YOUR WIFI PASSWORD"
+#define ADDRESS "192.168.0.170"
 #define PORT 8090
-#define HOST "192.168.0.172:8090"
+#define HOST "192.168.0.170:8090"
 
 #define AT "AT\r\n"
 #define AT_RST "AT+RST\r\n"
@@ -98,8 +98,8 @@ uint8_t ESP8266_check_wifi_connection();
 #define AT_CIPMUX0 "AT+CIPMUX=0\r\n"
 #define AT_CIPCLOSE "AT+CIPCLOSE\r\n"
 #define AT_CIPSTATUS "AT+CIPSTATUS\r\n"
-#define AT_CIPSTART_TCP "AT+CIPSTART=\"TCP\",\"192.168.0.172\",8090\r\n"
-#define AT_CWJAP "AT+CWJAP=\"VIDEOTRON6379\",\"XY7XY7VCW3UVV\"\r\n"
+#define AT_CIPSTART_TCP "AT+CIPSTART=\"TCP\",\"192.168.0.170\",8090\r\n"
+#define AT_CWJAP "AT+CWJAP=\"YOUR WIFI\",\"YOUR WIFI PASSWORD\"\r\n"
 
 #define MAX_ANSWER_LENGTH 250
 #define POST_LENGTH 500
@@ -108,8 +108,8 @@ uint8_t ESP8266_check_wifi_connection();
 #define AT_ERROR   1
 #define AT_TIMEOUT 2
 
-#define COUNTER_NEW_SAMPLE_GRAPH 900
-#define COUNTER_NEW_SAMPLE_LIVE  22
+#define COUNTER_NEW_SAMPLE_GRAPH 600
+#define COUNTER_NEW_SAMPLE_LIVE  21
 
 #define DATA_SENT     0
 #define DATA_NOT_SENT 1

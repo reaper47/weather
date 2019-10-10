@@ -1,6 +1,0 @@
-dht11.c:4:13:DHT11_sample	48	static
-dht11.c:21:6:_start_signal	8	static
-dht11.c:32:6:_is_response_valid	16	static
-dht11.c:44:6:_read	24	static
-dht11.c:58:6:_is_read_valid	16	static
-dht11.c:65:6:DHT11_to_post	152	static

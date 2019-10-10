@@ -65,6 +65,6 @@ bool _is_read_valid(uint8_t buffer[DHT11_N_BYTES])
 void DHT11_to_post(char *buffer, size_t len, SampleDHT11 sample, char *endpoint, char *host)
 {
 	char json[JSON_LENGTH] = {"\0"};
-    snprintf(json, JSON_LENGTH, "{\"temperature\":%f,\"humidity\":%f,\"station_id\":%d}", sample.temperature, sample.humidity, sample.station_id);
+    snprintf(json, JSON_LENGTH, "{\"temperature\":%.2f,\"humidity\":%.2f,\"station_id\":%d}", sample.temperature, sample.humidity, sample.station_id);
     snprintf(buffer, len, "POST %s HTTP/1.1\r\nHost: %s\r\nContent-Type: application/json\r\nContent-Length: %d\r\n\r\n%s\r\n\r\n", endpoint, host, strlen(json), json);
 }

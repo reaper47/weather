@@ -352,8 +352,7 @@ uint8_t ESP8266_wake_up()
 	if (ESP8266_send_cmd(AT, "OK") != AT_OK)
 		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT command failed on device wakeup\r\n");
 
-	if (ESP8266_send_cmd(AT_RST, "ready") != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT+RST command failed on device wakeup\r\n");
+	ESP8266_send_cmd(AT_RST, "ready");
 
 	if (ESP8266_send_cmd(ATE0, "OK") != AT_OK)
 		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: ATE0 command failed on device wakeup\r\n");
@@ -405,7 +404,7 @@ uint8_t ESP8266_send_data(const char *data, const char *address, uint16_t port)
 
 	uint8_t is_data_sent = DATA_NOT_SENT;
 	uint16_t len = strlen(data);
-	char msg[20] = "";
+	char msg[20] = {"\0"};
 	sprintf(msg, "AT+CIPSEND=%d\r\n", len);
 
 	if (ESP8266_send_cmd(msg, ">") == AT_OK) {
