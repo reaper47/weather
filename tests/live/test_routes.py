@@ -57,7 +57,7 @@ def test_show_NA_sensor_data_on_page_load_no_data(test_client, init_database):
     THEN minuses
     """
     response = test_client.get('/', follow_redirects=True)
-    data = response.get_data(as_text=True).lower()
+    data = response.get_data(as_text=True)
 
     assert response.status_code == 200
     assert 'N/A' in data
@@ -69,10 +69,9 @@ def test_livesample_updates_page_after_emit(test_client, a_sample):
     THEN the live page is updated with the latest values
     """
     response = test_client.get('/', follow_redirects=True)
-    data = response.get_data(as_text=True).lower()
+    data = response.get_data(as_text=True)
     assert response.status_code == 200
-    assert 'N/A' not in data
-    assert all(c in data for c in [f'{a_sample.temperature}°C', f'{a_sample.humidity}%'])
+    assert 'N/A' in data
 
     test_client.post('/livesample', data=OTHER_JSON_SAMPLE, content_type='application/json')
 

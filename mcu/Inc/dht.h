@@ -8,10 +8,10 @@
 #include "gpio_ext.h"
 #include "time_ext.h"
 
-#define DHT11_N_BITS     40
-#define DHT11_N_BYTES    5
-#define DHT11_Pin GPIO_PIN_5
-#define DHT11_GPIO_Port GPIOC
+#define DHT_N_BITS     40
+#define DHT_N_BYTES    5
+#define DHT_Pin GPIO_PIN_5
+#define DHT_GPIO_Port GPIOC
 #define IDX_BYTE_IRH 0
 #define IDX_BYTE_DRH 1
 #define IDX_BYTE_ITP 2
@@ -23,17 +23,18 @@
 #define SetBit(A,k)   ( A[(k/8)] |= (1 << (7-(k%8))) )
 #define ClearBit(A,k) ( A[(k/8)] &= ~(1 << (7-(k%8))) )
 
-typedef struct SamplesDHT11 {
+typedef struct SamplesDHT {
 	uint8_t station_id;
 	float humidity;
 	float temperature;
-} SampleDHT11;
+} SampleDHT;
 
-struct SamplesDHT11 DHT11_sample();
-void DHT11_to_post(char *buffer, size_t len, SampleDHT11 sample, char *endpoint, char *host);
+struct SamplesDHT DHT_sample();
+void DHT_to_post(char *buffer, size_t len, SampleDHT sample, char *endpoint, char *host);
 void _start_signal(void);
 bool _is_response_valid(void);
-void _read(uint8_t buffer[DHT11_N_BYTES]);
-bool _is_read_valid(uint8_t buffer[DHT11_N_BYTES]);
+void _read(uint8_t buffer[DHT_N_BYTES]);
+bool _is_read_valid(uint8_t buffer[DHT_N_BYTES]);
+bool _is_DHT11(uint8_t buffer[DHT_N_BYTES]);
 
 #endif /* __DHT11_H */

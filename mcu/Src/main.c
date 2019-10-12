@@ -109,11 +109,11 @@ int main(void)
   CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
   DWT->CYCCNT = 0;
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
-  HAL_TIM_Base_Start_IT(&htim6);
 
   HAL_UART_Transmit(&huart2, (uint8_t*)"\r\nProgram Started\r\n", (uint16_t) strlen("\r\nProgram Started\r\n"), HAL_MAX_DELAY);
-  DHT11_sample();
+  DHT_sample();
   while (ESP8266_wake_up() != ESP_WAKEUP_SUCCESS);
+  HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -134,7 +134,6 @@ int main(void)
   }
   /* USER CODE END 3 */
 }
-
 
 /**
   * @brief System Clock Configuration
@@ -332,13 +331,11 @@ static void MX_GPIO_Init(void)
 
 }
 
-/**************************************************/
-/* USER CODE BEGIN 4 ******************************/
-/**************************************************/
+/* USER CODE BEGIN 4 */
 void sample_and_post_dht(char *endpoint)
 {
-	SampleDHT11 sample = DHT11_sample();
-	DHT11_to_post(post, POST_LENGTH, sample, endpoint, HOST);
+	SampleDHT sample = DHT_sample();
+	DHT_to_post(post, POST_LENGTH, sample, endpoint, HOST);
 	ESP8266_send_data(post, ADDRESS, PORT);
 	memset(post, 0, sizeof post);
 }
@@ -360,9 +357,13 @@ uint8_t ESP8266_wake_up()
 	if (ESP8266_send_cmd(AT_CIPMUX0, "OK") != AT_OK)
 		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT+CIPMUX=0 command failed on device wakeup\r\n");
 
+	if (ESP8266_send_cmd(AT_CIPMODE0, "OK") != AT_OK)
+		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT+CIPMODE=0 command failed on device wakeup\r\n");
+
 	if (ESP8266_check_wifi_connection() != AT_OK)
 		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: Cannot connect to SSID on device wakeup\r\n");
 
+	HAL_UART_Transmit(&huart2, (uint8_t*)ESP_WAKEUP_SUCCESS_MSG, (uint16_t) strlen(ESP_WAKEUP_SUCCESS_MSG), HAL_MAX_DELAY);
 	return ESP_WAKEUP_SUCCESS;
 }
 
@@ -370,9 +371,9 @@ uint8_t ESP8266_wake_up()
 uint8_t ESP8266_open_tcp_port()
 {
 	if (ESP8266_check_wifi_connection() != AT_OK)
-		return AT_ERROR;
+		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: Cannot connect to SSID\r\n");
 
-	if (ESP8266_send_cmd(AT_CIPSTATUS, ADDRESS) != AT_OK) {
+	if (ESP8266_send_cmd(AT_CIPSTATUS, "4") == AT_OK || ESP8266_send_cmd(AT_CIPSTATUS, "2") == AT_OK) {
 		if (ESP8266_send_cmd(AT_CIPSTART_TCP, "OK") != AT_OK)
 			return AT_ERROR;
 	}
@@ -383,14 +384,11 @@ uint8_t ESP8266_open_tcp_port()
 
 uint8_t ESP8266_check_wifi_connection()
 {
-	if (ESP8266_send_cmd(AT_CIFSR, "192.168") != AT_OK) {
-		if (ESP8266_send_cmd(AT, "OK") != AT_OK)
-			while (ESP8266_wake_up() != ESP_WAKEUP_SUCCESS);
-
-		if (ESP8266_send_cmd(AT_CWJAP, "WIFI GOT IP") != AT_OK)
-			return AT_ERROR;
-
-		HAL_UART_Transmit(&huart2, (uint8_t*)WIFI_UP, (uint16_t) strlen(WIFI_UP), HAL_MAX_DELAY);
+	if (ESP8266_send_cmd(AT_IS_CONNECTED, SSID) != AT_OK) {
+		if (ESP8266_send_cmd(AT_CWJAP, "WIFI GOT IP") != AT_OK) {
+			if (ESP8266_wake_up() != ESP_WAKEUP_SUCCESS)
+				return AT_ERROR;
+		}
 	}
 	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0x0);
 	return AT_OK;
@@ -405,7 +403,7 @@ uint8_t ESP8266_send_data(const char *data, const char *address, uint16_t port)
 	uint8_t is_data_sent = DATA_NOT_SENT;
 	uint16_t len = strlen(data);
 	char msg[20] = {"\0"};
-	sprintf(msg, "AT+CIPSEND=%d\r\n", len);
+	snprintf(msg, sizeof msg, "AT+CIPSEND=%d\r\n", len);
 
 	if (ESP8266_send_cmd(msg, ">") == AT_OK) {
 		is_data_sent = DATA_SENT;
@@ -420,7 +418,7 @@ uint8_t ESP8266_send_data(const char *data, const char *address, uint16_t port)
 uint8_t ESP8266_send_cmd(const char *cmd, const char *examcode)
 {
 	HAL_UART_Transmit(&huart3, (uint8_t*)cmd, (uint16_t) strlen(cmd), HAL_MAX_DELAY);
-	uint8_t at_state = ESP8266_AT_check_response(examcode, 10);
+	uint8_t at_state = ESP8266_AT_check_response(examcode, 5);
 	ESP_answer_clear();
 	return at_state;
 }
@@ -432,7 +430,6 @@ uint8_t ESP8266_AT_check_response(char const *expected_text, uint16_t delay_s)
 	while (counter++ < delay_s) {
 		if (strstr((char*)ESP_answer, expected_text) != NULL)
 			return AT_OK;
-
 		HAL_Delay(1000);
 	}
 

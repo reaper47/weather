@@ -33,7 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
-#include "dht11.h"
+#include "dht.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -85,21 +85,24 @@ uint8_t ESP8266_check_wifi_connection();
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
-#define SSID "YOUR WIFI"
-#define PASSWORD "YOUR WIFI PASSWORD"
-#define ADDRESS "192.168.0.170"
-#define PORT 8090
-#define HOST "192.168.0.170:8090"
+#define SSID "your wifi"                <--- to update
+#define PASSWORD "your wifi password"   <--- to update
+#define ADDRESS "192.168.0.170"         <--- to update
+#define PORT 8090                       <--- to update
+#define HOST "192.168.0.170:8090"       <--- to update
 
 #define AT "AT\r\n"
 #define AT_RST "AT+RST\r\n"
 #define ATE0 "ATE0\r\n"
 #define AT_CIFSR "AT+CIFSR\r\n"
+#define AT_CIPSERVER0 "AT+CIPSERVER=0\r\n"
 #define AT_CIPMUX0 "AT+CIPMUX=0\r\n"
+#define AT_CIPMODE0 "AT+CIPMODE=0\r\n"
 #define AT_CIPCLOSE "AT+CIPCLOSE\r\n"
 #define AT_CIPSTATUS "AT+CIPSTATUS\r\n"
-#define AT_CIPSTART_TCP "AT+CIPSTART=\"TCP\",\"192.168.0.170\",8090\r\n"
-#define AT_CWJAP "AT+CWJAP=\"YOUR WIFI\",\"YOUR WIFI PASSWORD\"\r\n"
+#define AT_CIPSTART_TCP "AT+CIPSTART=\"TCP\",\"192.168.0.170\",8090\r\n" <--- to update
+#define AT_CWJAP "AT+CWJAP=\"your wifi\",\"your wifi password\"\r\n"     <--- to update
+#define AT_IS_CONNECTED "AT+CWJAP?\r\n"
 
 #define MAX_ANSWER_LENGTH 250
 #define POST_LENGTH 500
@@ -108,14 +111,15 @@ uint8_t ESP8266_check_wifi_connection();
 #define AT_ERROR   1
 #define AT_TIMEOUT 2
 
-#define COUNTER_NEW_SAMPLE_GRAPH 600
-#define COUNTER_NEW_SAMPLE_LIVE  21
+#define COUNTER_NEW_SAMPLE_GRAPH 900
+#define COUNTER_NEW_SAMPLE_LIVE  11
 
 #define DATA_SENT     0
 #define DATA_NOT_SENT 1
 
 #define ESP_WAKEUP_SUCCESS 0
 #define ESP_WAKEUP_FAILURE 1
+#define ESP_WAKEUP_SUCCESS_MSG "SUCCESS: ESP8266 wake up\r\n"
 
 #define WIFI_UP "Wifi connection established\r\n"
 #define TCP_CONNECTION_FAILED "ERROR: TCP connection failed\r\n"
