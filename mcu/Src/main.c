@@ -48,7 +48,7 @@ UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
-
+ESP8266_HandleTypeDef hesp;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,13 +62,7 @@ static void MX_TIM6_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-char ESP_answer[MAX_ANSWER_LENGTH];
-char post[POST_LENGTH] = {"\0"};
-
-char current_rx_byte = 0;
-uint8_t ESP_answer_write_point = 0;
-uint8_t ESP_TotalReadByteCounter = 0;
-
+char post_buffer[POST_LENGTH] = {"\0"};
 uint8_t sample_counter_live = 0;
 uint16_t new_sample_counter_graph = 0;
 /* USER CODE END 0 */
@@ -106,25 +100,24 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-  DWT->CYCCNT = 0;
-  DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+  DWT_init();
 
   HAL_UART_Transmit(&huart2, (uint8_t*)"\r\nProgram Started\r\n", (uint16_t) strlen("\r\nProgram Started\r\n"), HAL_MAX_DELAY);
   DHT_sample();
-  while (ESP8266_wake_up() != ESP_WAKEUP_SUCCESS);
+  ESP8266_init(&hesp, &huart3, &huart2, SSID, PASSWORD, TCP_ADDRESS, TCP_PORT);
+  while (ESP8266_start(&hesp) != ESP_START_SUCCESS);
   HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-      if (new_sample_counter_graph >= COUNTER_NEW_SAMPLE_GRAPH) {
+      if (new_sample_counter_graph >= COUNTER_GRAPH_SAMPLE_SECONDS) {
     	  new_sample_counter_graph = 0;
     	  sample_and_post_dht(ENDPOINT_NEW_SAMPLE);
       }
 
-      if (sample_counter_live >= COUNTER_NEW_SAMPLE_LIVE) {
+      if (sample_counter_live >= COUNTER_LIVE_SAMPLE_SECONDS) {
     	  sample_counter_live = 0;
     	  sample_and_post_dht(ENDPOINT_LIVE_SAMPLE);
       }
@@ -335,137 +328,15 @@ static void MX_GPIO_Init(void)
 void sample_and_post_dht(char *endpoint)
 {
 	SampleDHT sample = DHT_sample();
-	DHT_to_post(post, POST_LENGTH, sample, endpoint, HOST);
-	ESP8266_send_data(post, ADDRESS, PORT);
-	memset(post, 0, sizeof post);
-}
-
-
-uint8_t ESP8266_wake_up()
-{
-	HAL_UART_Receive_IT(&huart3, (uint8_t*)&current_rx_byte, 1); // Start Receiving
-	ESP_answer_clear();
-
-	if (ESP8266_send_cmd(AT, "OK") != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT command failed on device wakeup\r\n");
-
-	ESP8266_send_cmd(AT_RST, "ready");
-
-	if (ESP8266_send_cmd(ATE0, "OK") != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: ATE0 command failed on device wakeup\r\n");
-
-	if (ESP8266_send_cmd(AT_CIPMUX0, "OK") != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT+CIPMUX=0 command failed on device wakeup\r\n");
-
-	if (ESP8266_send_cmd(AT_CIPMODE0, "OK") != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: AT+CIPMODE=0 command failed on device wakeup\r\n");
-
-	if (ESP8266_check_wifi_connection() != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: Cannot connect to SSID on device wakeup\r\n");
-
-	HAL_UART_Transmit(&huart2, (uint8_t*)ESP_WAKEUP_SUCCESS_MSG, (uint16_t) strlen(ESP_WAKEUP_SUCCESS_MSG), HAL_MAX_DELAY);
-	return ESP_WAKEUP_SUCCESS;
-}
-
-
-uint8_t ESP8266_open_tcp_port()
-{
-	if (ESP8266_check_wifi_connection() != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, "ERROR: Cannot connect to SSID\r\n");
-
-	if (ESP8266_send_cmd(AT_CIPSTATUS, "4") == AT_OK || ESP8266_send_cmd(AT_CIPSTATUS, "2") == AT_OK) {
-		if (ESP8266_send_cmd(AT_CIPSTART_TCP, "OK") != AT_OK)
-			return AT_ERROR;
-	}
-
-	return AT_OK;
-}
-
-
-uint8_t ESP8266_check_wifi_connection()
-{
-	if (ESP8266_send_cmd(AT_IS_CONNECTED, SSID) != AT_OK) {
-		if (ESP8266_send_cmd(AT_CWJAP, "WIFI GOT IP") != AT_OK) {
-			if (ESP8266_wake_up() != ESP_WAKEUP_SUCCESS)
-				return AT_ERROR;
-		}
-	}
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0x0);
-	return AT_OK;
-}
-
-
-uint8_t ESP8266_send_data(const char *data, const char *address, uint16_t port)
-{
-	if (ESP8266_open_tcp_port() != AT_OK)
-		return ESP8266_AT_command_error(ESP_WAKEUP_FAILURE, TCP_CONNECTION_FAILED);
-
-	uint8_t is_data_sent = DATA_NOT_SENT;
-	uint16_t len = strlen(data);
-	char msg[20] = {"\0"};
-	snprintf(msg, sizeof msg, "AT+CIPSEND=%d\r\n", len);
-
-	if (ESP8266_send_cmd(msg, ">") == AT_OK) {
-		is_data_sent = DATA_SENT;
-		HAL_UART_Transmit(&huart3, (uint8_t*)data, len, HAL_MAX_DELAY);
-		HAL_UART_Transmit(&huart2, (uint8_t*)"Data sent\r\n", (uint16_t) strlen("Data sent\r\n"), HAL_MAX_DELAY);
-	}
-
-	return is_data_sent;
-}
-
-
-uint8_t ESP8266_send_cmd(const char *cmd, const char *examcode)
-{
-	HAL_UART_Transmit(&huart3, (uint8_t*)cmd, (uint16_t) strlen(cmd), HAL_MAX_DELAY);
-	uint8_t at_state = ESP8266_AT_check_response(examcode, 5);
-	ESP_answer_clear();
-	return at_state;
-}
-
-
-uint8_t ESP8266_AT_check_response(char const *expected_text, uint16_t delay_s)
-{
-	uint8_t counter = 0;
-	while (counter++ < delay_s) {
-		if (strstr((char*)ESP_answer, expected_text) != NULL)
-			return AT_OK;
-		HAL_Delay(1000);
-	}
-
-	if (strstr((char*)ESP_answer, "ERROR") != NULL)
-		return AT_ERROR;
-	return AT_TIMEOUT;
-}
-
-
-void ESP_answer_clear()
-{
-	memset(ESP_answer, 0, sizeof ESP_answer);
-	ESP_answer_write_point = 0;
-}
-
-
-uint8_t ESP8266_AT_command_error(uint8_t error_val, char *message)
-{
-	HAL_UART_Transmit(&huart2, (uint8_t*)message, (uint16_t) strlen(message), HAL_MAX_DELAY);
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0x1);
-	return error_val;
+	DHT_to_post(post_buffer, sample, endpoint, hesp.host);
+	ESP8266_send_data(&hesp, post_buffer);
 }
 
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if (huart->Instance == USART3) {
-		ESP_answer[ESP_answer_write_point] = current_rx_byte;
-		if (ESP_answer_write_point < MAX_ANSWER_LENGTH - 1)
-			ESP_answer_write_point++;
-		else
-			ESP_answer_write_point = 0;
-
-		ESP_TotalReadByteCounter++;
-		HAL_UART_Receive_IT(&huart3, (uint8_t*)&current_rx_byte, 1);
-	}
+	if (huart->Instance == USART3)
+		ESP8266_receive_answer(&hesp);
 }
 
 

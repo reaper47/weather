@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
-void delay_us(uint32_t us);
+void DWT_init();
+void DWT_delay_us(uint32_t us);
 
 #endif /* __TIME_EXT_H */
