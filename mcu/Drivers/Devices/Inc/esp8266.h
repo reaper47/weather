@@ -27,7 +27,6 @@
 #define ESP_START_SUCCESS 0
 #define ESP_START_FAILURE 1
 
-
 #define ESP_MSG_START_SUCCESS "SUCCESS: ESP8266 wake up\r\n"
 #define ERROR_MSG_AT          "ERROR: AT command failed on device wakeup\r\n"
 #define ERROR_MSG_ATE0        "ERROR: ATE0 command failed on device wakeup\r\n"
@@ -37,21 +36,28 @@
 
 #define SSID_LENGTH        20
 #define PASSWORD_LENGTH    50
-#define CWJAP_LENGTH       SSID_LENGTH + PASSWORD_LENGTH
-#define TCP_ADDRESS_LENGTH 15
-#define CIPSTART_LENGTH    TCP_ADDRESS_LENGTH + 35
-#define HOST_LENGTH        20
+#define CWJAP_LENGTH       SSID_LENGTH + PASSWORD_LENGTH + 20
+#define ADDRESS_LENGTH     15
+#define CIPSTART_LENGTH    ADDRESS_LENGTH + 35
+#define HOST_LENGTH        25
 #define MAX_ANSWER_LENGTH  250
 
+// Structures
+typedef enum { TCP, UDP } ConnectionType;
+
+typedef struct {
+	char ssid[SSID_LENGTH];
+	char password[PASSWORD_LENGTH];
+	char address[ADDRESS_LENGTH];
+	uint16_t port;
+	char connection_type[3];
+} NetworkInfo;
 
 typedef struct {
 	UART_HandleTypeDef *huart_device;
 	UART_HandleTypeDef *huart_external; // An external UART like FT232RL
-	char ssid[SSID_LENGTH];
-	char password[PASSWORD_LENGTH];
+	NetworkInfo *net_info;
 	char at_cwjap[CWJAP_LENGTH];
-	char tcp_address[TCP_ADDRESS_LENGTH];
-	uint16_t tcp_port;
 	char at_cipstart[CIPSTART_LENGTH];
 	char host[HOST_LENGTH];
 	char current_rx_byte;
@@ -61,18 +67,22 @@ typedef struct {
 } ESP8266_HandleTypeDef;
 
 
-void ESP8266_init(ESP8266_HandleTypeDef *hesp, UART_HandleTypeDef *huart_device, UART_HandleTypeDef *huart_external,
-		          char *ssid, char *password, char *tcp_address, uint16_t tcp_port);
-void ESP8266_update_wifi_info(ESP8266_HandleTypeDef *hesp, char *ssid, char *password);
-void ESP8266_update_tcp_info(ESP8266_HandleTypeDef *hesp, char *address, uint16_t port);
-uint8_t ESP8266_start(ESP8266_HandleTypeDef *hesp);
-uint8_t ESP8266_send_data(ESP8266_HandleTypeDef *hesp, const char *data);
-uint8_t ESP8266_send_cmd(ESP8266_HandleTypeDef *hesp, const char *cmd, const char *examcode);
-uint8_t _open_tcp_port(ESP8266_HandleTypeDef *hesp);
-uint8_t _check_wifi_connection(ESP8266_HandleTypeDef *hesp);
-uint8_t _AT_command_error(UART_HandleTypeDef *huart, uint8_t error_val, char *message);
-uint8_t _AT_check_response(ESP8266_HandleTypeDef *hesp, const char *expected_text, uint16_t delay_s);
-void _answer_clear(ESP8266_HandleTypeDef *hesp);
-void ESP8266_receive_answer(ESP8266_HandleTypeDef *hesp);
+// Public Functions
+void ESP8266_Init(ESP8266_HandleTypeDef *hesp, UART_HandleTypeDef *huart_device, UART_HandleTypeDef *huart_external, NetworkInfo *net_info);
+uint8_t ESP8266_Start(ESP8266_HandleTypeDef *hesp);
+uint8_t ESP8266_SendData(ESP8266_HandleTypeDef *hesp, const char *data);
+uint8_t ESP8266_SendCmd(ESP8266_HandleTypeDef *hesp, const char *cmd, const char *examcode);
+void ESP8266_UpdateWifiInfo(ESP8266_HandleTypeDef *hesp, char *new_ssid, char *new_password);
+void ESP8266_UpdateTcpInfo(ESP8266_HandleTypeDef *hesp, char *new_address, uint16_t new_port);
+void ESP8266_ReceiveAnswer(ESP8266_HandleTypeDef *hesp);
+void NetworkInfo_Update(NetworkInfo *net_info, char *ssid, char *password, char *address, uint16_t port, ConnectionType type);
+
+// Private Functions
+uint8_t _ESP8266_OpenTcpPort(ESP8266_HandleTypeDef *hesp);
+uint8_t _ESP8266_CheckWifiConnection(ESP8266_HandleTypeDef *hesp);
+uint8_t _AT_CommandError(UART_HandleTypeDef *huart, uint8_t error_val, char *message);
+uint8_t _AT_CheckResponse(ESP8266_HandleTypeDef *hesp, const char *expected_text, uint16_t delay_s);
+void _ESP8266_AnswerClear(ESP8266_HandleTypeDef *hesp);
+char *_connection_type_to_string(ConnectionType type);
 
 #endif /* __ESP8266_H */

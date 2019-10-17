@@ -80,10 +80,11 @@ void sample_and_post_dht(char *endpoint);
 #define COUNTER_GRAPH_SAMPLE_SECONDS 900
 #define COUNTER_LIVE_SAMPLE_SECONDS  11
 
-#define SSID        "your wifi"
-#define PASSWORD    "your wifi password"
-#define TCP_ADDRESS "192.168.0.170"
-#define TCP_PORT    8090
+#define SSID      "VIDEOTRON6379"
+#define PASSWORD  "XY7XY7VCW3UVV"
+#define ADDRESS   "192.168.0.170"
+#define PORT      8090
+#define TYPE	  TCP
 
 #define ENDPOINT_NEW_SAMPLE  "/newsample"
 #define ENDPOINT_LIVE_SAMPLE "/livesample"

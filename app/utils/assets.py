@@ -12,7 +12,15 @@ bundles = {
                        f'{NODE}/bulma/css/bulma.min.css',
                        f'{NODE}/chart.js/dist/Chart.min.css',
                        filters='cssmin', output='gen/packed.css'),
-    'main_js': Bundle(f'{JS}/LiveChart.js',
-                      f'{NODE}/chart.js/dist/Chart.bundle.min.js',
+    'main_js': Bundle(f'{NODE}/chart.js/dist/Chart.bundle.min.js',
+                      f'{NODE}/deepmerge/dist/umd.js',
+                      f'{JS}/chart_globals.js',
+                      f'{JS}/LiveChart.js',
+                      f'{JS}/LiveChart_T.js',
+                      f'{JS}/LiveChart_RH.js',
+                      f'{JS}/LiveChart_HI.js',
+                      f'{JS}/LiveChart_T_RH.js',
+                      f'{JS}/LiveChart_T_HI.js',
+                      f'{JS}/LiveChart_HI_RH.js',
                       filters='jsmin', output='gen/packed.js')
 }

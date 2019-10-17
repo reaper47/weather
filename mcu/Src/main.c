@@ -49,6 +49,7 @@ UART_HandleTypeDef huart3;
 
 /* USER CODE BEGIN PV */
 ESP8266_HandleTypeDef hesp;
+NetworkInfo net_info;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,12 +101,13 @@ int main(void)
   MX_USART3_UART_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
-  DWT_init();
-
   HAL_UART_Transmit(&huart2, (uint8_t*)"\r\nProgram Started\r\n", (uint16_t) strlen("\r\nProgram Started\r\n"), HAL_MAX_DELAY);
-  DHT_sample();
-  ESP8266_init(&hesp, &huart3, &huart2, SSID, PASSWORD, TCP_ADDRESS, TCP_PORT);
-  while (ESP8266_start(&hesp) != ESP_START_SUCCESS);
+  DWT_Init();
+  NetworkInfo_Update(&net_info, SSID, PASSWORD, ADDRESS, PORT, TYPE);
+
+  DHT_Sample();
+  ESP8266_Init(&hesp, &huart3, &huart2, &net_info);
+  while (ESP8266_Start(&hesp) != ESP_START_SUCCESS);
   HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
@@ -327,16 +329,16 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void sample_and_post_dht(char *endpoint)
 {
-	SampleDHT sample = DHT_sample();
-	DHT_to_post(post_buffer, sample, endpoint, hesp.host);
-	ESP8266_send_data(&hesp, post_buffer);
+	SampleDHT sample = DHT_Sample();
+	DHT_ToPost(post_buffer, sample, endpoint, hesp.host);
+	ESP8266_SendData(&hesp, post_buffer);
 }
 
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if (huart->Instance == USART3)
-		ESP8266_receive_answer(&hesp);
+		ESP8266_ReceiveAnswer(&hesp);
 }
 
 

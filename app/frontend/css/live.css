@@ -8,10 +8,8 @@
 }
 
 #live-tile > article {
+  border-radius: 0;
   padding-left: 10px;
   padding-right: 0;
-}
-
-#live-tile > article:first-of-type {
   margin-bottom: 0 !important;
 }

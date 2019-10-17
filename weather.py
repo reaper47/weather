@@ -1,6 +1,5 @@
 from app import create_app, db, socketio
 from app.models.sampling import Station, DHT
-from werkzeug.serving import WSGIRequestHandler
 
 app = create_app()
 

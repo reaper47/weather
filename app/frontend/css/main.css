@@ -9,3 +9,7 @@ html {
 .navbar-burger span:nth-child(3) {
   top: calc(30px);
 }
+
+*:focus {
+  outline: none !important;
+}

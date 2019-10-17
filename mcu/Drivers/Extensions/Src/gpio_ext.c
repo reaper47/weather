@@ -1,7 +1,7 @@
 #include "gpio_ext.h"
 
 
-void gpio_set_output(GPIO_TypeDef *port, uint16_t pin)
+void GPIO_SetOutput(GPIO_TypeDef *port, uint16_t pin)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = pin;
@@ -10,7 +10,7 @@ void gpio_set_output(GPIO_TypeDef *port, uint16_t pin)
 }
 
 
-void gpio_set_input(GPIO_TypeDef *port, uint16_t pin)
+void GPIO_SetInput(GPIO_TypeDef *port, uint16_t pin)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	GPIO_InitStruct.Pin = pin;
