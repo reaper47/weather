@@ -33,8 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
-#include "dht.h"
-#include "esp8266.h"
+#include "core.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -56,12 +55,18 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-void sample_and_post_dht(char *endpoint);
+//void sample_and_post_dht(char *endpoint);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define DS18B20_Pin GPIO_PIN_3
+#define DS18B20_GPIO_Port GPIOC
+#define TEMT600_Pin GPIO_PIN_0
+#define TEMT600_GPIO_Port GPIOA
+#define FC37_Pin GPIO_PIN_1
+#define FC37_GPIO_Port GPIOA
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
@@ -79,12 +84,6 @@ void sample_and_post_dht(char *endpoint);
 /* USER CODE BEGIN Private defines */
 #define COUNTER_GRAPH_SAMPLE_SECONDS 900
 #define COUNTER_LIVE_SAMPLE_SECONDS  11
-
-#define SSID      "VIDEOTRON6379"
-#define PASSWORD  "XY7XY7VCW3UVV"
-#define ADDRESS   "192.168.0.170"
-#define PORT      8090
-#define TYPE	  TCP
 
 #define ENDPOINT_NEW_SAMPLE  "/newsample"
 #define ENDPOINT_LIVE_SAMPLE "/livesample"

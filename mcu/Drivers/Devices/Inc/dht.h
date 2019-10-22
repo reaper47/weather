@@ -21,8 +21,8 @@
 #define IDX_BYTE_DTP 3
 #define IDX_BYTE_CHK 4
 
-#define JSON_LENGTH 200
-#define POST_LENGTH 500
+#define DHT_JSON_LENGTH 100
+#define DHT_POST_LENGTH 500
 
 #define SetBit(A,k)   ( A[(k/8)] |= (1 << (7-(k%8))) )
 #define ClearBit(A,k) ( A[(k/8)] &= ~(1 << (7-(k%8))) )
@@ -35,11 +35,13 @@ typedef struct {
 	float temperature_fahrenheit;
 	float heat_index_celsius;
 	float heat_index_fahrenheit;
-} SampleDHT;
+} DHT_t;
 
 // Public Functions
-SampleDHT DHT_Sample();
-void DHT_ToPost(char *buffer, SampleDHT sample, char *endpoint, char *host);
+void DHT_Init(uint8_t station_id);
+void DHT_Sample();
+void DHT_ToPost(char *buffer, char *endpoint, char *host);
+void DHT_ToJson_Partial(char *buffer);
 
 // Private Functions
 void _DHT_StartSignal(void);
