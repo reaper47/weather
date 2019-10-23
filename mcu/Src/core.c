@@ -56,11 +56,16 @@ void sample_and_post(char *endpoint, bool *is_conversion_completed)
 	BME280_Sample(true);
 	BME280_ToJson_Partial(json_bme280);
 
+	Temperature_t average_temperature;
+	average_temperature.celsius = (DHT_GetTemperature(true) + BME280_GetTemperature(true) + ds18b20_temperatures[0].celsius)/3;
+	average_temperature.fahrenheit = (DHT_GetTemperature(false) + BME280_GetTemperature(false) + ds18b20_temperatures[0].fahrenheit)/3;
+
 	// Send HTTP Header
 	memset(json, 0, sizeof json);
 	snprintf(json, sizeof json,
-			 "{%s,%s,%s,%s,%s}",
-			 json_dht, json_ds18b20, json_fc37, json_temt600, json_bme280);
+			 "{%s,%s,%s,%s,%s,\"T\":{\"C\":%.2f,\"F\":%.2f}}",
+			 json_dht, json_ds18b20, json_fc37, json_temt600, json_bme280,
+			 average_temperature.celsius, average_temperature.fahrenheit);
 
 	memset(http_header, 0, sizeof http_header);
 	snprintf(http_header, sizeof http_header,

@@ -253,6 +253,7 @@ int8_t user_i2c_write(uint8_t dev_id, uint8_t reg_addr, uint8_t *reg_data, uint1
 
 void BME280_Sample(bool is_forced);
 void BME280_ToJson_Partial(char *buffer);
+double BME280_GetTemperature(bool in_celsius);
 
 int8_t stream_sensor_data_normal_mode(UART_HandleTypeDef *huart);
 int8_t stream_sensor_data_forced_mode(UART_HandleTypeDef *huart);

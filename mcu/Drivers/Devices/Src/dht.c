@@ -133,3 +133,11 @@ bool _DHT_IsDht11(uint8_t buffer[DHT_N_BYTES])
 {
 	return (buffer[IDX_BYTE_DRH] == 0 && buffer[IDX_BYTE_DTP] == 0);
 }
+
+
+float DHT_GetTemperature(bool in_celsius)
+{
+	if (in_celsius)
+		return dht.temperature_celsius;
+	return dht.temperature_fahrenheit;
+}

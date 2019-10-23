@@ -42,6 +42,7 @@ void DHT_Init(uint8_t station_id);
 void DHT_Sample();
 void DHT_ToPost(char *buffer, char *endpoint, char *host);
 void DHT_ToJson_Partial(char *buffer);
+float DHT_GetTemperature(bool in_celsius);
 
 // Private Functions
 void _DHT_StartSignal(void);

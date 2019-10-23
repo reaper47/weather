@@ -1592,3 +1592,10 @@ void print_sensor_data(UART_HandleTypeDef *huart)
 #endif
 	HAL_UART_Transmit(huart, (uint8_t*)msg, (uint16_t) strlen(msg), HAL_MAX_DELAY);
 }
+
+double BME280_GetTemperature(bool in_celsius)
+{
+	if (in_celsius)
+		return comp_data.temperature;
+	return to_fahrenheit(comp_data.temperature);
+}
