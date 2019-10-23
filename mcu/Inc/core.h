@@ -2,6 +2,8 @@
 #define __CORE_H
 
 #include <stdbool.h>
+#include <stdlib.h>
+#include "bme280.h"
 #include "dht.h"
 #include "ds18b20.h"
 #include "esp8266.h"
@@ -18,11 +20,13 @@
 #define ADC1_BUFFER_LENGTH NUM_ADC1_SENSORS*4
 
 #define JSON_LENGTH DHT_JSON_LENGTH + TEMT600_JSON_LENGTH + \
-					FC37_JSON_LENGTH + DS18B20_JSON_LENGTH + 10
+					FC37_JSON_LENGTH + DS18B20_JSON_LENGTH + \
+					BME280_JSON_LENGTH + 10
 #define HTTP_HEADER_LENGTH 1024
 
 // Public Functions
-void start_sensors(UART_HandleTypeDef *huart_esp8266, UART_HandleTypeDef *huart_stm32, ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim_temt);
+void start_sensors(UART_HandleTypeDef *huart_esp8266, UART_HandleTypeDef *huart_stm32,
+		           ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim_temt, I2C_HandleTypeDef *hi2c);
 void sample_and_post(char *endpoint, bool *is_conversion_completed);
 
 // Private Functions

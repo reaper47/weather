@@ -9,10 +9,12 @@ char json_dht[DHT_JSON_LENGTH] = {'\0'};
 char json_fc37[FC37_JSON_LENGTH] = {'\0'};
 char json_temt600[TEMT600_JSON_LENGTH] = {'\0'};
 char json_ds18b20[DS18B20_JSON_LENGTH] = {'\0'};
+char json_bme280[BME280_JSON_LENGTH] = {'\0'};
 char json[JSON_LENGTH] = {'\0'};
 
 
-void start_sensors(UART_HandleTypeDef *huart_esp8266, UART_HandleTypeDef *huart_stm32, ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim_temt)
+void start_sensors(UART_HandleTypeDef *huart_esp8266, UART_HandleTypeDef *huart_stm32,
+		           ADC_HandleTypeDef *hadc, TIM_HandleTypeDef *htim_temt, I2C_HandleTypeDef *hi2c)
 {
 	NetworkInfo_Update(SSID, PASSWORD, ADDRESS, PORT, TYPE);
 	ESP8266_Init(huart_esp8266, huart_stm32);
@@ -23,6 +25,10 @@ void start_sensors(UART_HandleTypeDef *huart_esp8266, UART_HandleTypeDef *huart_
 	DS18B20_Init(DS18B20_Resolution_12bits);
 	FC37_Init();
 	TEMT600_Init();
+	BME280_Init(hi2c, BME280_FORCED_MODE, BME280_MONITORING_WEATHER);
+
+	DHT_Sample();
+	BME280_Sample(true);
 
 	HAL_TIM_Base_Start(htim_temt);
 	HAL_ADC_Start_DMA(hadc, (uint32_t*)adc1_buffer, ADC1_BUFFER_LENGTH);
@@ -47,9 +53,14 @@ void sample_and_post(char *endpoint, bool *is_conversion_completed)
 	DS18B20_Sample(ds18b20_temperatures);
 	DS18B20_ToJson_Partial(json_ds18b20, ds18b20_temperatures);
 
+	BME280_Sample(true);
+	BME280_ToJson_Partial(json_bme280);
+
 	// Send HTTP Header
 	memset(json, 0, sizeof json);
-	snprintf(json, sizeof json,	"{%s,%s,%s,%s}", json_dht, json_ds18b20, json_fc37, json_temt600);
+	snprintf(json, sizeof json,
+			 "{%s,%s,%s,%s,%s}",
+			 json_dht, json_ds18b20, json_fc37, json_temt600, json_bme280);
 
 	memset(http_header, 0, sizeof http_header);
 	snprintf(http_header, sizeof http_header,

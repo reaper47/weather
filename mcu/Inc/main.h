@@ -79,8 +79,12 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define BME280_SCL_Pin GPIO_PIN_15
+#define BME280_SCL_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
+#define BME280_SDA_Pin GPIO_PIN_7
+#define BME280_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define COUNTER_GRAPH_SAMPLE_SECONDS 900
 #define COUNTER_LIVE_SAMPLE_SECONDS  11
