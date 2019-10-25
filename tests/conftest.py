@@ -13,8 +13,13 @@ A_HUMIDITY = 56.0
 A_LUX = 333
 A_PRESSURE = 100170
 
-A_JSON_SAMPLE = json.dumps({'station_id': 1, 'RH': 55.1, 'T_C': 23.8, 'T_F': 76.2, 'HI_C': 24, 'HI_F': 74.2})
-A_JSON_SAMPLE = json.dumps({'station_id': 1, 'RH': 44.2, 'T_C': 30.2, 'T_F': 77.9, 'HI_C': 33.2, 'HI_F': 81.2})
+A_JSON_SAMPLE = json.dumps({
+    'DHT': {'station_id': 1, 'RH': 51.3, 'T_C': 21.9, 'T_F': 71.4, 'HI_C': 21.5, 'HI_F': 70.7},
+    'DS18B20': {'0': {'T_C': 21.81, 'T_F': 71.26}}, 'FC37': {'rain': 'N'},
+    'TEMT600': {'lux': 7},
+    'BME280': {'H_C': 21.67, 'H_F': 71.01, 'RH': 41.05, 'P': 100297.2},
+    'T': {'C': 21.8, 'F': 71.23}
+})
 
 
 @pytest.fixture(scope='function')

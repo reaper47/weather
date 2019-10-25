@@ -3,7 +3,7 @@ from flask import render_template, request
 from app import socketio
 from app.live import bp
 from app.models.sampling import get_samples_for_day, add_new_sample
-from app.utils.dto import Sample
+from app.utils.dto import Sample, DHT_Dto, DS18B20_Dto, FC37_Dto, TEMT6000_Dto, BME280_Dto, Averages_Dto
 
 graphs = [('temperature', 'Temperature'), ('heat-index', 'Heat Index'), ('humidity', 'Humidity'),
           ('rain', 'Rain'), ('light', 'Light'), ('', ''), ('temperature-heat-index', 'Temperature + Heat Index'),
@@ -22,17 +22,21 @@ def index():
 
 @bp.route('/newsample', methods=['POST'])
 def newsample():
-    json_sample = request.get_json()
-    json_sample['date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    sample = Sample(station=json_sample['DHT']['station_id'],
-                    humidity=json_sample['DHT']['RH'],
-                    temperature_c=json_sample['T']['C'],
-                    temperature_f=json_sample['T']['F'],
-                    heat_index_c=json_sample['DHT']['HI_C'],
-                    heat_index_f=json_sample['DHT']['HI_F'],
-                    date=json_sample['date'])
+    json = request.get_json()
+    dht = DHT_Dto(station_id=json['DHT']['station_id'], humidity=json['DHT']['RH'], t_c=json['DHT']['T_C'],
+                  t_f=json['DHT']['T_F'], hi_c=json['DHT']['HI_C'], hi_f=json['DHT']['HI_F'])
+    ds18b20 = DS18B20_Dto(t_c=json['DS18B20']['T_C'], t_f=json['DHT']['T_F'])
+    fc37 = FC37_Dto(rain=json['FC37']['rain'])
+    temt6000 = TEMT6000_Dto(lux=json['TEMT6000']['lux'])
+    bme280 = BME280_Dto(t_c=json['BME280']['T_C'], t_f=json['BME280']['T_F'],
+                        humidity=json['BME280']['RH'], pressure=json['BME280']['P'])
+    averages = Averages_Dto(t_c=json['T']['C'], t_f=json['T']['F'])
+    date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    json['date'] = date
+
+    sample = Sample(dht, ds18b20, fc37, temt6000, bme280, averages, date)
     add_new_sample(sample)
-    socketio.emit('update_graph', json_sample)
+    socketio.emit('update_graph', json)
     return ''
 
 

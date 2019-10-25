@@ -1,5 +1,5 @@
 from unittest import mock
-from tests.conftest import A_JSON_SAMPLE, OTHER_JSON_SAMPLE
+from tests.conftest import A_JSON_SAMPLE
 
 MOCK_REQUEST = 'app.live.routes.request'
 MOCK_GET_SAMPLES_FOR_DAY = 'app.live.routes.get_samples_for_day'
@@ -61,21 +61,3 @@ def test_show_NA_sensor_data_on_page_load_no_data(test_client, init_database):
 
     assert response.status_code == 200
     assert 'N/A' in data
-
-
-def test_livesample_updates_page_after_emit(test_client, a_sample):
-    """
-    WHEN posting sensor data for the live feature
-    THEN the live page is updated with the latest values
-    """
-    response = test_client.get('/', follow_redirects=True)
-    data = response.get_data(as_text=True)
-    assert response.status_code == 200
-    assert 'N/A' in data
-
-    test_client.post('/livesample', data=OTHER_JSON_SAMPLE, content_type='application/json')
-
-    response = test_client.get('/', follow_redirects=True)
-    data = response.get_data(as_text=True).lower()
-    assert response.status_code == 200
-    assert all(c in data for c in [f"{OTHER_JSON_SAMPLE['temperature']}°C", f"{OTHER_JSON_SAMPLE['humidity']}%"])
