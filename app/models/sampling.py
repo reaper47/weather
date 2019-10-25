@@ -2,6 +2,7 @@ from datetime import datetime
 from app import db
 from app.utils.database import commit
 from app.utils.dto import Sample
+from sqlalchemy.schema import UniqueConstraint
 
 
 class Station(db.Model):
@@ -10,6 +11,11 @@ class Station(db.Model):
     lng = db.Column(db.Float, nullable=False)
     name = db.Column(db.String(length=50), nullable=False)
 
+    def __eq__(self, other):
+        return (self.lat == other.lat and
+                self.lng == other.lng and
+                self.name == other.name)
+
     def __hash__(self):
         return hash(self.name)
 
@@ -17,26 +23,163 @@ class Station(db.Model):
         return f'<Station #{self.id} ({self.name}): [{self.lat}, {self.lng}]>'
 
 
+class Temperature(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    celsius = db.Column(db.Float, nullable=False)
+    fahrenheit = db.Column(db.Float, nullable=False)
+    __table_args__ = (UniqueConstraint('celsius', 'fahrenheit', name='unique_temperature'),)
+
+    def __init__(self, celsius, fahrenheit):
+        self.celsius = celsius
+        self.fahrenheit = fahrenheit
+
+    def __eq__(self, other):
+        celsius_result = self.celsius - other.celsius
+        fahrenheit_result = self.fahrenheit - other.fahrenheit
+        return celsius_result <= 0.001 and fahrenheit_result <= 0.001
+
+    def __hash__(self):
+        return hash(self.celsius)
+
+    def __repr__(self):
+        return f'<Temperature #{self.id}: [{self.celsius},{self.fahrenheit}]>'
+
+
+class HeatIndex(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    celsius = db.Column(db.Float, nullable=False)
+    fahrenheit = db.Column(db.Float, nullable=False)
+    __table_args__ = (UniqueConstraint('celsius', 'fahrenheit', name='unique_heat_index'),)
+
+    def __init__(self, celsius, fahrenheit):
+        self.celsius = celsius
+        self.fahrenheit = fahrenheit
+
+    def __eq__(self, other):
+        return (self.celsius == other.celsius and
+                self.fahrenheit == other.fahrenheit)
+
+    def __hash__(self):
+        return hash(self.celsius)
+
+    def __repr__(self):
+        return f'<Heat Index #{self.id}: [{self.celsius},{self.fahrenheit}]>'
+
+
 class DHT(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     station_id = db.Column(db.Integer, db.ForeignKey('station.id'))
     station = db.relationship('Station', backref='dht_station', uselist=False)
-    temperature_c = db.Column(db.Float, nullable=False)
-    temperature_f = db.Column(db.Float, nullable=False)
+    temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
+    temperature = db.relationship('Temperature', backref='dht_temperature', uselist=False)
     humidity = db.Column(db.Float, nullable=False)
-    heat_index_c = db.Column(db.Float, nullable=False)
-    heat_index_f = db.Column(db.Float, nullable=False)
-    date = db.Column(db.DateTime(), default=datetime.utcnow)
+    heat_index_id = db.Column(db.Integer, db.ForeignKey('heat_index.id'))
+    heat_index = db.relationship('HeatIndex', backref='dht_heat_index', uselist=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return (self.station == other.station and
+                self.temperature == other.temperature and
+                self.humidity == other.humidity and
+                self.heat_index == other.heat_index and
+                str(self.date) == str(other.date))
 
     def __hash__(self):
         return hash(self.date)
 
     def __repr__(self):
         return (f'<DHT #{self.id}.{self.station_id} -\n'
-                f' Temperature: {self.temperature_c} ({self.temperature_f}) <>\n'
-                f' RH: {self.humidity} <>\n'
-                f' HI: {self.heat_index_c} ({self.heat_index_f}) <>\n'
-                f' Date: {self.date}>')
+                f'  Temperature: {self.temperature}\n'
+                f'  RH: {self.humidity}\n'
+                f'  HI: {self.heat_index}\n'
+                f'  Date: {self.date}>')
+
+
+class DS18B20(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
+    temperature = db.relationship('Temperature', backref='ds18b20_temperature', uselist=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return (self.temperature == other.temperature and
+                str(self.date) == str(other.date))
+
+    def __hash__(self):
+        return hash(self.date)
+
+    def __repr__(self):
+        return (f'<DS18B20 #{self.id} -\n'
+                f'  Temperature: {self.temperature}\n'
+                f'  Date: {self.date}>')
+
+
+class FC37(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rain = db.Column(db.CHAR(length=1), nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return (self.rain == other.rain and
+                str(self.date) == str(other.date))
+
+    def __hash__(self):
+        return hash(self.date)
+
+    def __repr__(self):
+        return (f'<FC37 #{self.id} -\n'
+                f'  Rain: {self.rain}\n'
+                f'  Date: {self.date}>')
+
+
+class TEMT6000(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lux = db.Column(db.Integer, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return (self.lux == other.lux and
+                str(self.date) == str(other.date))
+
+    def __hash__(self):
+        return hash(self.date)
+
+    def __repr__(self):
+        return (f'<TEMT6000 #{self.id} -\n'
+                f'  Lux: {self.lux}\n'
+                f'  Date: {self.date}>')
+
+
+class BME280(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
+    temperature = db.relationship('Temperature', backref='bme280_temperature', uselist=False)
+    humidity = db.Column(db.Float, nullable=False)
+    pressure = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return (self.temperature == other.temperature and
+                (self.humidity - other.humidity) <= 0.001 and
+                self.pressure == other.pressure and
+                str(self.date) == str(other.date))
+
+    def __hash__(self):
+        return hash(self.date)
+
+    def __repr__(self):
+        return (f'<BME280 #{self.id} -\n'
+                f'  Temperature: {self.temperature}\n'
+                f'  Humidity: {self.humidity}\n'
+                f'  Pressure: {self.pressure}\n'
+                f'  Date: {self.date}>')
+
+
+class Averages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
+    temperature = db.relationship('Temperature', backref='averages_temperature', uselist=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 def get_samples_for_day(date):
@@ -46,8 +189,36 @@ def get_samples_for_day(date):
 
 
 def add_new_sample(sample: Sample):
-    station = Station.query.filter_by(id=sample.station).first()
-    dht = DHT(station=station, temperature_c=sample.temperature_c, temperature_f=sample.temperature_f,
-              heat_index_c=sample.heat_index_c, heat_index_f=sample.heat_index_f, humidity=sample.humidity,
-              date=sample.date)
-    commit(dht)
+    t = find_temperature(Temperature, sample.dht.t_c, sample.dht.t_f)
+    hi = find_temperature(HeatIndex, sample.dht.hi_c, sample.dht.hi_f)
+    station = Station.query.filter_by(id=sample.dht.station_id).first()
+    dht = DHT(station=station, temperature=t, heat_index=hi, humidity=sample.dht.humidity, date=sample.date)
+
+    t = find_temperature(Temperature, sample.ds18b20.t_c, sample.ds18b20.t_f)
+    ds18b20 = DS18B20(temperature=t, date=sample.date)
+
+    fc37 = FC37(rain=sample.fc37.rain, date=sample.date)
+    temt6000 = TEMT6000(lux=sample.temt6000.lux, date=sample.date)
+
+    t = find_temperature(Temperature, sample.bme280.t_c, sample.bme280.t_f)
+    bme280 = BME280(temperature=t, humidity=sample.bme280.humidity,
+                    pressure=sample.bme280.pressure, date=sample.date)
+
+    t = find_temperature(Temperature, sample.averages.t_c, sample.averages.t_f)
+    averages = Averages(temperature=t, date=sample.date)
+
+    commit([dht, ds18b20, fc37, temt6000, bme280, averages])
+
+
+def find_temperature(Entity, celsius, fahrenheit):
+    for x in Entity.query.all():
+        if x == Entity(celsius, fahrenheit):
+            entry = x
+            break
+    else:
+        entry = None
+
+    if entry is None:
+        entry = Entity(celsius=celsius, fahrenheit=fahrenheit)
+        commit(entry)
+    return entry

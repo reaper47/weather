@@ -31,12 +31,14 @@
           </div>
           <div class="navbar-item">
             <select id="live-chart-select">
-              <option value="temperature" selected="selected">Temperature</option>
-              <option value="humidity">Humidity</option>
-              <option value="heat-index">Heat Index</option>
-              <option value="temperature-heat-index">Temperature + Heat Index</option>
-              <option value="temperature-humidity">Temperature + Humidity</option>
-              <option value="heat-index-humidity">Heat Index + Humidity</option>
+              <option value="{{ graphs[0][0] }}" selected="selected">{{ graphs[0][1] }}</option>
+              {% for value, label in graphs[1:] %}
+              {% if not value %}
+              <option disabled>───────────────────</option>
+              {% else %}
+              <option value="{{ value }}">{{ label }}</option>
+              {% endif %}
+              {% endfor %}
             </select>
           </div>
           <div class="navbar-item">

@@ -6,39 +6,21 @@
     <div class="tile is-vertical">
       <div class="tile">
         <div id="live-tile" class="tile is-parent is-vertical no-padding">
-          <article class="tile is-child notification is-primary sensor-data-container">
-            <p id="live-temperature" class="title sensor-data">N/A</p>
-            <p class="title">Temperature</p>
+          {% for x in [('is-primary', 'Temperature'), ('is-danger', 'Heat Index'), ('is-link', 'Humidity')] %}
+          <article class="tile is-child notification {{ x[0] }} sensor-data-container">
+            <p id="live-{{ '-'.join(x[1].lower().split(' ')) }}" class="title sensor-data">N/A</p>
+            <p class="title">{{ x[1] }}</p>
           </article>
-          <article class="tile is-child notification is-danger sensor-data-container">
-            <p id="live-heat-index" class="title sensor-data">N/A</p>
-            <p class="title">Heat Index</p>
-          </article>
-          <article class="tile is-child notification is-link sensor-data-container">
-            <p id="live-humidity" class="title sensor-data">N/A</p>
-            <p class="title">Humidity</p>
-          </article>
+          {% endfor %}
         </div>
         <div class="tile is-parent is-10 no-padding">
           <article class="tile is-child notification is-dark">
-            <div id="live-chart-temperature-humidity__container" class="hide">
-              <canvas id="live-chart-temperature-humidity"></canvas>
+            {% for x in ('temperature', 'temperature-humidity', 'humidity', 'heat-index',
+                         'temperature-heat-index', 'heat-index-humidity') %}
+            <div id="live-chart-{{ x }}__container" {% if loop.index > 1 %}class="hide"{% endif %}>
+              <canvas id="live-chart-{{ x }}"></canvas>
             </div>
-            <div id="live-chart-temperature__container">
-              <canvas id="live-chart-temperature"></canvas>
-            </div>
-            <div id="live-chart-humidity__container" class="hide">
-              <canvas id="live-chart-humidity"></canvas>
-            </div>
-            <div id="live-chart-heat-index__container" class="hide">
-              <canvas id="live-chart-heat-index"></canvas>
-            </div>
-            <div id="live-chart-temperature-heat-index__container" class="hide">
-              <canvas id="live-chart-temperature-heat-index"></canvas>
-            </div>
-            <div id="live-chart-heat-index-humidity__container" class="hide">
-              <canvas id="live-chart-heat-index-humidity"></canvas>
-            </div>
+            {% endfor %}
           </article>
         </div>
       </div>
@@ -109,33 +91,38 @@ window.onload = () => {
   const socket = io.connect(`http://${document.domain}:${location.port}`)
   socket.on('update_graph', (sample) => {
     date_ = new Date(sample['date']);
+    const T_C = sample['T']['C'];
+    const T_F = sample['T']['F'];
+    const RH = sample['DHT']['RH'];
+    const HI_C = sample['DHT']['HI_C'];
+    const HI_F = sample['DHT']['HI_F'];
 
     if (isCelsius) {
-      liveChart_T.addDataPoint(date_, sample['T_C']);
-      liveChart_HI.addDataPoint(date_, sample['HI_C']);
-      liveChart_T_HI.addDataPoint(date_, sample['T_C'], sample['HI_C']);
-      liveChart_T_RH.addDataPoint(date_, sample['T_C'], sample['RH'])
-      liveChart_HI_RH.addDataPoint(date_, sample['HI_C'], sample['RH']);
+      liveChart_T.addDataPoint(date_, T_C);
+      liveChart_HI.addDataPoint(date_, HI_C);
+      liveChart_T_HI.addDataPoint(date_, T_C, HI_C);
+      liveChart_T_RH.addDataPoint(date_, T_C, RH)
+      liveChart_HI_RH.addDataPoint(date_, HI_C, RH);
     } else {
-      liveChart_T.addDataPoint(date_, sample['T_F']);
-      liveChart_HI.addDataPoint(date_, sample['HI_F']);
-      liveChart_T_HI.addDataPoint(date_, sample['T_F'], sample['HI_F']);
-      liveChart_HI_RH.addDataPoint(date_, sample['HI_F'], sample['RH']);
-      liveChart_T_RH.addDataPoint(date_, sample['T_F'], sample['RH']);
+      liveChart_T.addDataPoint(date_, T_F);
+      liveChart_HI.addDataPoint(date_, HI_F);
+      liveChart_T_HI.addDataPoint(date_, T_F, HI_F);
+      liveChart_HI_RH.addDataPoint(date_, HI_F, RH);
+      liveChart_T_RH.addDataPoint(date_, T_F, RH);
     }
 
-    temperatures_c.push({ 'x': date_, 'y': sample['T_C']});
-    heat_indexes_c.push({ 'x': date_, 'y': sample['HI_C']});
-    temperatures_f.push({'x': date_, 'y': sample['T_F']});
-    heat_indexes_f.push({'x': date_, 'y': sample['HI_F']});
+    temperatures_c.push({ 'x': date_, 'y': T_C});
+    heat_indexes_c.push({ 'x': date_, 'y': HI_C});
+    temperatures_f.push({'x': date_, 'y': T_F});
+    heat_indexes_f.push({'x': date_, 'y': HI_F});
 
-    liveChart_RH.addDataPoint(date_, sample['RH']);
+    liveChart_RH.addDataPoint(date_, RH);
   })
 
   socket.on('update_live', (new_sample) => {
     sample = new_sample
     updateTemperatureLive(isCelsius, sample)
-    liveHumidity.textContent = `${sample.RH}%`;
+    liveHumidity.textContent = `${sample.DHT.RH}%`;
   })
 
   // Add event listeners
@@ -190,11 +177,11 @@ window.onload = () => {
 
 function updateTemperatureLive(isCelsius, sample) {
   if (isCelsius) {
-    liveTemperature.textContent = `${sample.T_C}°C`;
-    liveHeatIndex.textContent = `${sample.HI_C}°C`;
+    liveTemperature.textContent = `${sample.T.C}°C`;
+    liveHeatIndex.textContent = `${sample.DHT.HI_C}°C`;
   } else {
-    liveTemperature.textContent = `${sample.T_F}°F`;
-    liveHeatIndex.textContent = `${sample.HI_F}°F`;
+    liveTemperature.textContent = `${sample.T.F}°F`;
+    liveHeatIndex.textContent = `${sample.DHT.HI_F}°F`;
   }
 }
 
