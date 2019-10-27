@@ -61,3 +61,15 @@ def test_show_NA_sensor_data_on_page_load_no_data(test_client, init_database):
 
     assert response.status_code == 200
     assert 'N/A' in data
+
+
+@mock.patch(MOCK_REQUEST)
+@mock.patch(MOCK_SOCKETIO_EMIT)
+def test_livesample_send_message(mock_socketio, mock_request, test_client):
+    """
+    WHEN posting sensor data to newsample
+    THEN a SocketIO message is sent to the client
+    """
+    test_client.post('/livesample', data=A_JSON_SAMPLE, content_type='application/json')
+
+    assert mock_socketio.emit.called

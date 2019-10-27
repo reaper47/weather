@@ -1,3 +1,4 @@
+import math
 from datetime import datetime
 from app import db
 from app.utils.database import commit
@@ -34,8 +35,8 @@ class Temperature(db.Model):
         self.fahrenheit = fahrenheit
 
     def __eq__(self, other):
-        celsius_result = self.celsius - other.celsius
-        fahrenheit_result = self.fahrenheit - other.fahrenheit
+        celsius_result = math.fabs(self.celsius - other.celsius)
+        fahrenheit_result = math.fabs(self.fahrenheit - other.fahrenheit)
         return celsius_result <= 0.001 and fahrenheit_result <= 0.001
 
     def __hash__(self):
@@ -185,7 +186,47 @@ class Averages(db.Model):
 def get_samples_for_day(date):
     day_start = f'{date.year}-{date.month}-{date.day} 00:00:00'
     day_end = f'{date.year}-{date.month}-{date.day} 23:59:59'
-    return DHT.query.filter(DHT.date.between(day_start, day_end)).all()
+
+    data = {
+        'DHT': {'T_C': [], 'T_F': [], 'HI_C': [], 'HI_F': [], 'RH': []},
+        'DS18B20': {'T_C': [], 'T_F': []},
+        'FC37': {'Rain': []},
+        'TEMT6000': {'Light': []},
+        'BME280': {'T_C': [], 'T_F': [], 'RH': [], 'P': []},
+        'Averages': {'T_C': [], 'T_F': []},
+        'dates': []
+    }
+
+    samples = DHT.query.filter(DHT.date.between(day_start, day_end)).all()
+    data['dates'] = [str(x.date) for x in samples]
+    data['DHT']['T_C'] = [x.temperature.celsius for x in samples]
+    data['DHT']['T_F'] = [x.temperature.fahrenheit for x in samples]
+    data['DHT']['HI_C'] = [x.heat_index.celsius for x in samples]
+    data['DHT']['HI_F'] = [x.heat_index.fahrenheit for x in samples]
+    data['DHT']['RH'] = [x.humidity for x in samples]
+
+    samples = DS18B20.query.filter(DS18B20.date.between(day_start, day_end)).all()
+    data['DS18B20']['T_C'] = [x.temperature.celsius for x in samples]
+    data['DS18B20']['T_F'] = [x.temperature.fahrenheit for x in samples]
+
+    map_rain = {'N': 0, 'L': 1, 'M': 2, 'H': 3}
+    samples = FC37.query.filter(FC37.date.between(day_start, day_end)).all()
+    data['FC37']['Rain'] = [map_rain[x.rain] for x in samples]
+
+    samples = TEMT6000.query.filter(TEMT6000.date.between(day_start, day_end)).all()
+    data['TEMT6000']['Light'] = [x.lux for x in samples]
+
+    samples = BME280.query.filter(BME280.date.between(day_start, day_end)).all()
+    data['BME280']['T_C'] = [x.temperature.celsius for x in samples]
+    data['BME280']['T_F'] = [x.temperature.fahrenheit for x in samples]
+    data['BME280']['RH'] = [x.humidity for x in samples]
+    data['BME280']['P'] = [x.pressure for x in samples]
+
+    samples = Averages.query.filter(Averages.date.between(day_start, day_end)).all()
+    data['Averages']['T_C'] = [x.temperature.celsius for x in samples]
+    data['Averages']['T_F'] = [x.temperature.fahrenheit for x in samples]
+
+    return data
 
 
 def add_new_sample(sample: Sample):

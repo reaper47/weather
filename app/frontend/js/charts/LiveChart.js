@@ -1,5 +1,5 @@
 class LiveChart {
-  constructor(liveChartID, temperatureData, humidityData = null) {
+  constructor(liveChartID) {
     this.__container = document.getElementById(liveChartID + '__container');
     this.__liveChartID = liveChartID;
     this.__ctx = document.getElementById(liveChartID).getContext('2d');
@@ -7,7 +7,6 @@ class LiveChart {
 
   __baseConfig() {
     return { 
-      type: 'line',
       options: {
         scales: {
           xAxes: [{
@@ -33,13 +32,7 @@ class LiveChart {
         afterDatasetsDraw: (chart) => {
           if (chart.tooltip._active && chart.tooltip._active.length) {
             const activePoint = chart.tooltip._active[0]
-            let y_axis;
-            if (chart.scales.Temperature)
-              y_axis = chart.scales.Temperature
-            else if (chart.scales.Humidity)
-              y_axis = chart.scales.Humidity
-            else
-              y_axis = chart.scales.HeatIndex
+            let y_axis = chart.scales[Object.keys(chart.scales)[1]];
               
             const x = activePoint.tooltipPosition().x
             this.__ctx.save();
@@ -70,6 +63,17 @@ class LiveChart {
     }
 
     this.chart.update()
+  }
+  
+  labelRain(value) {
+    if (value === 0) 
+      return 'None';
+    else if (value === 1)
+      return 'Light';
+    else if (value === 2)
+      return 'Moderate';
+    else if (value === 3)
+      return 'Heavy';
   }
 
   changeTemperatureUnit(samples) {

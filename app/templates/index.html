@@ -16,7 +16,9 @@
         <div class="tile is-parent is-10 no-padding">
           <article class="tile is-child notification is-dark">
             {% for x in ('temperature', 'temperature-humidity', 'humidity', 'heat-index',
-                         'temperature-heat-index', 'heat-index-humidity') %}
+                         'temperature-heat-index', 'heat-index-humidity', 'rain', 'light',
+                         'temperature-rain', 'temperature-light', 'heat-index-rain', 'heat-index-light',
+                         'rain-humidity', 'rain-light', 'light-humidity') %}
             <div id="live-chart-{{ x }}__container" {% if loop.index > 1 %}class="hide"{% endif %}>
               <canvas id="live-chart-{{ x }}"></canvas>
             </div>
@@ -28,173 +30,36 @@
   </div>
 </section>
 <script>
-var liveChart_T;
-var liveChart_RH;
-var liveChart_HI;
-var liveChart_T_HI;
-var liveChart_T_RH;
-var liveChart_HI_RH;
-let currentChart;
-let charts;
-
-const temperatureUnitSelect = document.getElementById('temperature-unit')
-const liveChartSelect = document.getElementById('live-chart-select');
-
-const liveTemperature = document.getElementById('live-temperature');
-const liveHeatIndex = document.getElementById('live-heat-index');
-const liveHumidity = document.getElementById('live-humidity');
-const liveZoomButton = document.getElementById('live-zoom-button');
-
 window.onload = () => {
-  let isCelsius = true;
-  let temperatures_c = [];
-  let temperatures_f = [];
-  let humidities = [];
-  let heat_indexes_c = [];
-  let heat_indexes_f = [];
-  let date_;
-  let sample;
+  let data = {{ samples|tojson }};
+  data['dates'] = data['dates'].map(x => new Date(x));
 
-  // Load the sensor data
-  {% for sample in samples %}
-  date_ = new Date('{{ sample.date }}');
-  temperatures_c.push({'x': date_, 'y': {{ sample.temperature_c }}});
-  temperatures_f.push({'x': date_, 'y': {{ sample.temperature_f }}});
-  humidities.push({'x': date_, 'y': {{ sample.humidity }}});
-  heat_indexes_c.push({'x': date_, 'y': {{ sample.heat_index_c }}});
-  heat_indexes_f.push({'x': date_, 'y': {{ sample.heat_index_f }}});
-  {% endfor %}
+  const liveTiles = {
+    'T': document.getElementById('live-temperature'),
+    'HI': document.getElementById('live-heat-index'),
+    'RH': document.getElementById('live-humidity')
+  }
 
-  // Create the Live charts
-  liveChart_T_RH = new LiveChart_T_RH('live-chart-temperature-humidity', temperatures_c, humidities);
-  liveChart_T_RH.create();
-
-  liveChart_T = new LiveChart_T('live-chart-temperature', temperatures_c);
-  liveChart_T.create();
-
-  liveChart_RH = new LiveChart_RH('live-chart-humidity', humidities);
-  liveChart_RH.create();
-
-  liveChart_HI = new LiveChart_HI('live-chart-heat-index', heat_indexes_c);
-  liveChart_HI.create();
-
-  liveChart_T_HI = new LiveChart_T_HI('live-chart-temperature-heat-index', temperatures_c, heat_indexes_c);
-  liveChart_T_HI.create();
-
-  liveChart_HI_RH = new LiveChart_HI_RH('live-chart-heat-index-humidity', heat_indexes_c, humidities);
-  liveChart_HI_RH.create()
-
-  currentChart = liveChart_T;
-  charts = [liveChart_T_RH, liveChart_T, liveChart_HI, liveChart_T_HI, liveChart_RH, liveChart_HI_RH];
+  const liveCharts = new LiveCharts(data, liveTiles);
+  liveCharts.create();
 
   // Establish the sockets
   const socket = io.connect(`http://${document.domain}:${location.port}`)
-  socket.on('update_graph', (sample) => {
-    date_ = new Date(sample['date']);
-    const T_C = sample['T']['C'];
-    const T_F = sample['T']['F'];
-    const RH = sample['DHT']['RH'];
-    const HI_C = sample['DHT']['HI_C'];
-    const HI_F = sample['DHT']['HI_F'];
+  socket.on('update_graph', (sample) => liveCharts.updateGraph(sample));
+  socket.on('update_live', (sample) => liveCharts.updateLive(sample));
 
-    if (isCelsius) {
-      liveChart_T.addDataPoint(date_, T_C);
-      liveChart_HI.addDataPoint(date_, HI_C);
-      liveChart_T_HI.addDataPoint(date_, T_C, HI_C);
-      liveChart_T_RH.addDataPoint(date_, T_C, RH)
-      liveChart_HI_RH.addDataPoint(date_, HI_C, RH);
-    } else {
-      liveChart_T.addDataPoint(date_, T_F);
-      liveChart_HI.addDataPoint(date_, HI_F);
-      liveChart_T_HI.addDataPoint(date_, T_F, HI_F);
-      liveChart_HI_RH.addDataPoint(date_, HI_F, RH);
-      liveChart_T_RH.addDataPoint(date_, T_F, RH);
-    }
-
-    temperatures_c.push({ 'x': date_, 'y': T_C});
-    heat_indexes_c.push({ 'x': date_, 'y': HI_C});
-    temperatures_f.push({'x': date_, 'y': T_F});
-    heat_indexes_f.push({'x': date_, 'y': HI_F});
-
-    liveChart_RH.addDataPoint(date_, RH);
-  })
-
-  socket.on('update_live', (new_sample) => {
-    sample = new_sample
-    updateTemperatureLive(isCelsius, sample)
-    liveHumidity.textContent = `${sample.DHT.RH}%`;
-  })
-
-  // Add event listeners
+  // Event listeners
+  const temperatureUnitSelect = document.getElementById('temperature-unit')
   temperatureUnitSelect.addEventListener('change', (unit) => {
-    isCelsius = (unit.target.value.localeCompare('celsius') == 0);
-    updateTemperatureUnit(isCelsius, sample, temperatures_c, temperatures_f);
+    const isCelsius = (unit.target.value.localeCompare('celsius') == 0);
+    liveCharts.updateTemperatureUnit(isCelsius);
   });
 
-  liveChartSelect.addEventListener('change', (type) => {
-    switch (type.target.value) {
-      case 'temperature':
-        currentChart = liveChart_T;
-        break;
-      case 'humidity':
-        currentChart = liveChart_RH;
-        break;
-      case 'heat-index':
-        currentChart = liveChart_HI;
-        break;
-      case 'temperature-heat-index':
-        currentChart = liveChart_T_HI;
-        break;
-      case 'temperature-humidity':
-        currentChart = liveChart_T_RH;
-        break;
-      case 'heat-index-humidity':
-        currentChart = liveChart_HI_RH;
-        break;
-      default:
-        break;
-    }
+  const liveChartSelect = document.getElementById('live-chart-select');
+  liveChartSelect.addEventListener('change', (type) => liveCharts.changeChart(type.target.value, liveZoomButton));
 
-    charts.forEach(chart => {
-      liveZoomButton.textContent = 'Zoom';
-      chart.unzoom();
-      chart.hide();
-    });
-
-    currentChart.show();
-  });
-
-  liveZoomButton.addEventListener('mousedown', (click) => {
-    if (click.target.textContent.localeCompare('Zoom') == 0) {
-      click.target.textContent = 'Unzoom';
-      currentChart.zoom();
-    } else {
-      click.target.textContent = 'Zoom';
-      currentChart.unzoom()
-    }
-  });
-}
-
-function updateTemperatureLive(isCelsius, sample) {
-  if (isCelsius) {
-    liveTemperature.textContent = `${sample.T.C}°C`;
-    liveHeatIndex.textContent = `${sample.DHT.HI_C}°C`;
-  } else {
-    liveTemperature.textContent = `${sample.T.F}°F`;
-    liveHeatIndex.textContent = `${sample.DHT.HI_F}°F`;
-  }
-}
-
-function updateTemperatureUnit(isCelsius, sample, samples_c, samples_f) {
-  if (sample)
-    updateTemperatureLive(isCelsius, sample)
-
-  let samples = isCelsius ? samples_c : samples_f;
-  liveChart_T.changeTemperatureUnit(samples)
-  liveChart_HI.changeTemperatureUnit(samples)
-  liveChart_T_RH.changeTemperatureUnit(samples)
-  liveChart_T_HI.changeTemperatureUnit(samples)
-  liveChart_HI_RH.changeTemperatureUnit(samples)
+  const liveZoomButton = document.getElementById('live-zoom-button');
+  liveZoomButton.addEventListener('mousedown', (click) => liveCharts.zoomChart(click.target));
 }
 </script>
 {% endblock %}

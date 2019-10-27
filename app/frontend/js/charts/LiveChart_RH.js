@@ -1,17 +1,18 @@
 class LiveChart_RH extends LiveChart {
-  constructor(liveChartID, humidityData) {
-    super(liveChartID, humidityData)
-    this.__config = deepmerge(super.__baseConfig(), this.__init_config(humidityData));
+  constructor(liveChartID, xvals, yvals) {
+    super(liveChartID)
+    this.__config = deepmerge(super.__baseConfig(), this.__init_config(xvals, yvals));
   }
 
-  __init_config(humidityData) {
+  __init_config(xvals, yvals) {
     return {
       type: 'line',
       data: {
+        labels: xvals,
         datasets: [{
           yAxisID: 'Humidity',
           label: 'Humidity',
-          data: humidityData,
+          data: yvals,
           fill: true,
           backgroundColor: 'rgba(52, 172, 224, 0.1)',
           borderColor: '#34ace0',
@@ -33,7 +34,6 @@ class LiveChart_RH extends LiveChart {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               suggestedMin: 0,
               suggestedMax: 100
-              
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.2)',

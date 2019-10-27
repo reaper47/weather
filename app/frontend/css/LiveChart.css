@@ -1,9 +1,4 @@
-#live-chart-temperature-humidity__container,
-#live-chart-temperature__container,
-#live-chart-humidity__container,
-#live-chart-heat-index__container,
-#live-chart-temperature-heat-index__container,
-#live-chart-heat-index-humidity__container {
+div[id$='__container'] {
   position: relative;
   margin: auto;
   height: 92vh;

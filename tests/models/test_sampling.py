@@ -119,8 +119,11 @@ def test_get_sample_for_day(a_dht_sample):
 
     samples_actual = get_samples_for_day(dates[2])
 
+    num_sensors_expected = 7
     num_samples_expected = 1
-    assert num_samples_expected == len(samples_actual)
+    assert num_sensors_expected == len(samples_actual)
+    for key in samples_actual['DHT']:
+        assert num_samples_expected == len(samples_actual['DHT'][key])
 
 
 def test_add_new_sample(a_station, a_dht_sample):

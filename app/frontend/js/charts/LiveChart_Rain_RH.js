@@ -1,23 +1,29 @@
-class LiveChart_HI_RH extends LiveChart {
-  constructor(liveChartID, heatIndexData, humidityData) {
-    super(liveChartID, heatIndexData, humidityData)
-    this.__config = deepmerge(super.__baseConfig(), this.__init_config(heatIndexData, humidityData));
+class LiveChart_Rain_RH extends LiveChart {
+  constructor(liveChartID, xvals, yvals1, yvals2) {
+    super(liveChartID, yvals1, yvals2)
+    this.__config = deepmerge(super.__baseConfig(), this.__init_config(xvals, yvals1, yvals2));
   }
 
-  __init_config(heatIndexData, humidityData) {
+  __init_config(xvals, yvals1, yvals2) {
     return {
+      type: 'bar',
       data: {
+        labels: xvals,
         datasets: [{
-          yAxisID: 'HeatIndex',
-          label: 'Heat Index',
-          data: heatIndexData,
-          borderColor: '#b33939',
-          pointBackgroundColor: '#d1ccc0'
+          yAxisID: 'Rain',
+          label: 'Rain',
+          data: yvals1,
+          backgroundColor: 'rgba(30, 144, 255, 0.3)',
+          borderColor: '#1e90ff',
+          pointBackgroundColor: '#d1ccc0',
+          order: 1
         },
         {
+          type: 'line',
           yAxisID: 'Humidity',
           label: 'Humidity',
-          data: humidityData,
+          data: yvals2,
+          backgroundColor: 'rgba(52, 172, 224, 0.1)',
           borderColor: '#34ace0',
           pointBackgroundColor: '#d1ccc0'
         }]
@@ -25,18 +31,19 @@ class LiveChart_HI_RH extends LiveChart {
       options: {
         scales: {
           yAxes: [{
-            id: 'HeatIndex',
+            id: 'Rain',
             scaleLabel: {
               display: true,
-              labelString: 'Heat Index (°C)',
+              labelString: 'Rain Intensity',
               lineHeight: 2,
               fontSize: 17,
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
+              min: 0,
+              max: 10,
               fontColor: 'rgba(255, 255, 255, 0.7)',
-              maxTicksLimit: 20,
-              suggestedMax: 100,
+              callback: (value) => super.labelRain(value),
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -45,20 +52,18 @@ class LiveChart_HI_RH extends LiveChart {
             position: 'left'
           },
           {
-            id: 'Humidity',
-            min: 0,
-            max: 100,
+           id: 'Humidity',
             scaleLabel: {
               display: true,
               labelString: 'Humidity (%)',
               lineHeight: 2,
-              fontSize: 17,
-              fontColor: 'rgba(255, 255, 255, 0.7)'
+              fontSize: 18,
+              fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               suggestedMin: 0,
-              suggestedMax: 100,
+              suggestedMax: 100
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -71,12 +76,12 @@ class LiveChart_HI_RH extends LiveChart {
       }
     }
   }
-    
+  
   zoom() {
     super.zoom(true);
   }
   
   unzoom() {
-    super.unzoom(0, 100, true, 0, 100);
+    super.unzoom(0, 4, true, 0, 100);
   }
 }

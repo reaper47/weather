@@ -1,38 +1,38 @@
-class LiveChart_HI extends LiveChart {
-  constructor(liveChartID, heatIndexData) {
-    super(liveChartID, heatIndexData)
-    this.__config = deepmerge(super.__baseConfig(), this.__init_config(heatIndexData));
+class LiveChart_Rain extends LiveChart {
+  constructor(liveChartID, xvals, yvals) {
+    super(liveChartID)
+    this.__config = deepmerge(super.__baseConfig(), this.__init_config(xvals, yvals));
   }
 
-  __init_config(heatIndexData) {
+  __init_config(xvals, yvals) {
     return {
-      type: 'line',
+      type: 'bar',
       data: {
+        labels: xvals,
         datasets: [{
-          yAxisID: 'HeatIndex',
-          label: 'Heat Index',
-          data: heatIndexData,
+          yAxisID: 'Rain',
+          label: 'Rain',
+          data: yvals,
           fill: true,
-          backgroundColor: 'rgba(255, 82, 82, 0.1)',
-          borderColor: '#b33939',
+          backgroundColor: 'rgba(30, 144, 255, 0.3)',
+          borderColor: '#1e90ff',
           pointBackgroundColor: '#d1ccc0'
         }]
       },
       options: {
         scales: {
           yAxes: [{
-            id: 'HeatIndex',
+            id: 'Rain',
             scaleLabel: {
               display: true,
-              labelString: 'Heat Index (°C)',
+              labelString: 'Rain Intensity',
               lineHeight: 2,
               fontSize: 17,
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
-              suggestedMin: 0,
-              suggestedMax: 100
+              callback: (value) => super.labelRain(value)
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -44,8 +44,8 @@ class LiveChart_HI extends LiveChart {
       }
     }
   }
-  
+    
   unzoom() {
-    super.unzoom(0, 100);
+    super.unzoom(0, 3);
   }
 }

@@ -25,7 +25,7 @@ def newsample():
     json = request.get_json()
     dht = DHT_Dto(station_id=json['DHT']['station_id'], humidity=json['DHT']['RH'], t_c=json['DHT']['T_C'],
                   t_f=json['DHT']['T_F'], hi_c=json['DHT']['HI_C'], hi_f=json['DHT']['HI_F'])
-    ds18b20 = DS18B20_Dto(t_c=json['DS18B20']['T_C'], t_f=json['DHT']['T_F'])
+    ds18b20 = DS18B20_Dto(t_c=json['DS18B20']['0']['T_C'], t_f=json['DS18B20']['0']['T_F'])
     fc37 = FC37_Dto(rain=json['FC37']['rain'])
     temt6000 = TEMT6000_Dto(lux=json['TEMT6000']['lux'])
     bme280 = BME280_Dto(t_c=json['BME280']['T_C'], t_f=json['BME280']['T_F'],

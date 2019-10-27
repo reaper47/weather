@@ -1,30 +1,31 @@
-class LiveChart_T extends LiveChart {
-  constructor(liveChartID, temperatureData) {
-    super(liveChartID, temperatureData)
-    this.__config = deepmerge(super.__baseConfig(), this.__init_config(temperatureData));
+class LiveChart_HI extends LiveChart {
+  constructor(liveChartID, xvals, yvals) {
+    super(liveChartID)
+    this.__config = deepmerge(super.__baseConfig(), this.__init_config(xvals, yvals));
   }
 
-  __init_config(temperatureData) {
+  __init_config(xvals, yvals) {
     return {
       type: 'line',
       data: {
+        labels: xvals,
         datasets: [{
-          yAxisID: 'Temperature',
-          label: 'Temperature',
-          data: temperatureData,
+          yAxisID: 'HeatIndex',
+          label: 'Heat Index',
+          data: yvals,
           fill: true,
-          backgroundColor: 'rgba(51, 217, 178,0.1)',
-          borderColor: '#218c74',
+          backgroundColor: 'rgba(255, 82, 82, 0.1)',
+          borderColor: '#b33939',
           pointBackgroundColor: '#d1ccc0'
         }]
       },
       options: {
         scales: {
           yAxes: [{
-            id: 'Temperature',
+            id: 'HeatIndex',
             scaleLabel: {
               display: true,
-              labelString: 'Temperature (°C)',
+              labelString: 'Heat Index (°C)',
               lineHeight: 2,
               fontSize: 17,
               fontColor: 'rgba(255, 255, 255, 0.7)',
