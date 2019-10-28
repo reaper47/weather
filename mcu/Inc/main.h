@@ -87,7 +87,7 @@ void Error_Handler(void);
 #define BME280_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 #define COUNTER_GRAPH_SAMPLE_SECONDS 900
-#define COUNTER_LIVE_SAMPLE_SECONDS  11
+#define COUNTER_LIVE_SAMPLE_SECONDS  21
 
 #define ENDPOINT_NEW_SAMPLE  "/newsample"
 #define ENDPOINT_LIVE_SAMPLE "/livesample"

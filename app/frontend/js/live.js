@@ -22,7 +22,7 @@ class LiveCharts {
     this.liveTiles = liveTiles;
     this.sample = null;
     this.isCelsius = true;
-    this.date = data['date'];  
+    this.dates = data['dates'];
     
     this.currentChart = this.charts['T'];
     this.chartLookupTable = {
@@ -65,41 +65,60 @@ class LiveCharts {
     const date_ = new Date(sample['date']);
     
     if (this.isCelsius) {
-      this.charts['T'].addDataPoint(date_, sample['T']['C']);
-      this.charts['HI'].addDataPoint(date_, sample['DHT']['HI_C']);
-      this.charts['T_HI'].addDataPoint(date_, sample['T']['C'], sample['DHT']['HI_C']);
-      this.charts['T_RH'].addDataPoint(date_, sample['T']['C'], sample['DHT']['RH']);
-      this.charts['T_Rain'].addDataPoint(date_, sample['T']['C'], sample['FC37']['Rain']);
-      this.charts['T_Light'].addDataPoint(date_, sample['DHT']['RH']);
-      this.charts['HI_RH'].addDataPoint(date_, sample['DHT']['HI_C'], sample['DHT']['RH']);
-      this.charts['HI_Rain'].addDataPoint(date_, sample['DHT']['HI_C'], sample['DHT']['RH']);
-      this.charts['HI_Light'].addDataPoint(date_, sample['DHT']['HI_C'], sample['TEMT6000']['Lux']);
+      this.charts['T'].addDataPoint(date_, sample.T.C);
+      this.charts['HI'].addDataPoint(date_, sample.DHT.HI_C);
+      this.charts['T_HI'].addDataPoint(date_, sample.T.C, sample.DHT.HI_C);
+      this.charts['T_RH'].addDataPoint(date_, sample.T.C, sample.DHT.RH);
+      this.charts['T_Rain'].addDataPoint(date_, sample.T.C, sample.FC37.rain);
+      this.charts['T_Light'].addDataPoint(date_, sample.DHT.RH);
+      this.charts['HI_RH'].addDataPoint(date_, sample.DHT.HI_C, sample.DHT.RH);
+      this.charts['HI_Rain'].addDataPoint(date_, sample.DHT.HI_C, sample.FC37.rain);
+      this.charts['HI_Light'].addDataPoint(date_, sample.DHT.HI_C, sample.TEMT6000.lux);
     } else {
-      this.charts['T'].addDataPoint(date_, sample['T']['F']);
-      this.charts['HI'].addDataPoint(date_, sample['DHT']['HI_F']);
-      this.charts['T_HI'].addDataPoint(date_, sample['T']['F'], sample['DHT']['HI_F']);
-      this.charts['T_RH'].addDataPoint(date_, sample['T']['F'], sample['DHT']['RH']);
-      this.charts['T_Rain'].addDataPoint(date_,sample['T']['F'], sample['FC37']['Rain']);
-      this.charts['HI_RH'].addDataPoint(date_, sample['DHT']['HI_F'], sample['DHT']['RH']);
-      this.charts['HI_Rain'].addDataPoint(date_, sample['DHT']['HI_F'], sample['DHT']['RH']);
-      this.charts['HI_Light'].addDataPoint(date_, sample['DHT']['HI_F'], sample['TEMT6000']['Lux']);
+      this.charts['T'].addDataPoint(date_, sample.T.F);
+      this.charts['HI'].addDataPoint(date_, sample.DHT.HI_F);
+      this.charts['T_HI'].addDataPoint(date_, sample.T.F, sample.DHT.HI_F);
+      this.charts['T_RH'].addDataPoint(date_, sample.T.F, sample.DHT.RH);
+      this.charts['T_Rain'].addDataPoint(date_,sample.T.F, sample.FC37.rain);
+      this.charts['HI_RH'].addDataPoint(date_, sample.DHT.HI_F, sample.DHT.RH);
+      this.charts['HI_Rain'].addDataPoint(date_, sample.DHT.HI_F, sample.FC37.rain);
+      this.charts['HI_Light'].addDataPoint(date_, sample.DHT.HI_F, sample.TEMT6000.lux);
     }
     
-    this.data.Averages.T_C.push({'x': date_, 'y': sample['T']['C']});
-    this.data.Averages.T_F.push({'x': date_, 'y': sample['T']['F']});
+    this.dates.push(date_);
+    this.data.Averages.T_C.push(sample['T']['C']);
+    this.data.Averages.T_F.push(sample['T']['F']);
     
-    this.charts['RH'].addDataPoint(date_, sample['DHT']['RH']);
-    this.charts['Rain'].addDataPoint(date_, sample['FC37']['Rain']);
-    this.charts['Light'].addDataPoint(date_, sample['TEMT6000']['Lux']);
-    this.charts['Rain_RH'].addDataPoint(date_, sample['FC37']['Rain'], sample['DHT']['RH']);
-    this.charts['Rain_Light'].addDataPoint(date_, sample['FC37']['Rain'], sample['TEMT6000']['Light']);
-    this.charts['Light_RH'].addDataPoint(date_, sample['TEMT6000']['Lux'], sample['DHT']['RH']);
+    this.charts['RH'].addDataPoint(date_, sample.DHT.RH);
+    this.charts['Rain'].addDataPoint(date_, sample.FC37.rain);
+    this.charts['Light'].addDataPoint(date_, sample.TEMT6000.lux);
+    this.charts['Rain_RH'].addDataPoint(date_, sample.FC37.rain, sample.DHT.RH);
+    this.charts['Rain_Light'].addDataPoint(date_, sample.FC37.rain, sample.TEMT6000.lux);
+    this.charts['Light_RH'].addDataPoint(date_, sample.TEMT6000.lux, sample.DHT.RH);
   }
   
   updateLive(new_sample) {
     this.sample = new_sample;
     this.updateLiveTemperature();
     this.liveTiles['RH'].textContent = `${this.sample.DHT.RH}%`;
+    this.liveTiles['Light'].textContent = `${this.sample.TEMT6000.lux}`;
+    this.liveTiles['Rain'].textContent = `${this.labelRain(this.sample.FC37.rain)}`;
+    this.liveTiles['P'].textContent = `${this.numberWithCommas(this.sample.BME280.P.toFixed(0))} Pa`;
+  }
+  
+  labelRain(char) {
+    if (char.localeCompare('N') === 0) 
+      return 'None';
+    else if (char.localeCompare('L') === 0)
+      return 'Light';
+    else if (char.localeCompare('M') === 0)
+      return 'Moderate';
+    else if (char.localeCompare('H') === 0)
+      return 'Heavy';
+  }
+  
+  numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
   
   updateLiveTemperature() {
@@ -118,9 +137,12 @@ class LiveCharts {
     if (this.sample)
       this.updateLiveTemperature(isCelsius, this.sample);
 
-    const charts = ['T', 'T_HI', 'T_RH', 'T_Rain', 'T_Light', 'HI', 'HI_RH', 'HI_Rain', 'HI_Light'];
+    const charts = ['T', 'T_RH', 'T_Rain', 'T_Light', 'HI', 'HI_RH', 'HI_Rain', 'HI_Light'];
     const samples = isCelsius ? this.data.Averages.T_C : this.data.Averages.T_F;
     charts.forEach(chart => this.charts[chart].changeTemperatureUnit(samples));
+    
+    const heatIndexSamples = isCelsius ? this.data.DHT.HI_C : this.data.DHT.HI_F;
+    this.charts['T_HI'].changeTemperatureUnit(samples, heatIndexSamples);
   }
   
   zoomChart(zoomButton) {

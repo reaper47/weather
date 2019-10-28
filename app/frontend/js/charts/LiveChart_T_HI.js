@@ -76,6 +76,7 @@ class LiveChart_T_HI extends LiveChart {
   
   changeTemperatureUnit(samples, heatIndexSamples) {
     super.changeTemperatureUnit(samples);
+    this.__config.data.datasets[1].data = heatIndexSamples;
     
     const heatLabel = this.__config.options.scales.yAxes[1].scaleLabel.labelString;
     if (heatLabel.includes('°C'))

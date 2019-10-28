@@ -19,7 +19,7 @@ void TEMT600_Sample()
 void TEMT600_ToJson_Partial(char *buffer)
 {
 	memset(buffer, 0, TEMT600_JSON_LENGTH);
-	snprintf(buffer, TEMT600_JSON_LENGTH, "\"TEMT600\":{\"lux\":%hu}", temt600.lux);
+	snprintf(buffer, TEMT600_JSON_LENGTH, "\"TEMT6000\":{\"lux\":%hu}", temt600.lux);
 }
 
 void TEMT600_SetRawValue(uint16_t raw_value)

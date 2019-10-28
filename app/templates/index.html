@@ -5,8 +5,9 @@
   <div class="tile is-ancestor">
     <div class="tile is-vertical">
       <div class="tile">
-        <div id="live-tile" class="tile is-parent is-vertical no-padding">
-          {% for x in [('is-primary', 'Temperature'), ('is-danger', 'Heat Index'), ('is-link', 'Humidity')] %}
+        <div id="live-tile" class="tile is-parent is-2  is-vertical no-padding">
+          {% for x in [('is-primary', 'Temperature'), ('is-danger', 'Heat Index'), ('is-link', 'Humidity'),
+                       ('is-warning', 'Lux'), ('is-info', 'Rain'), ('is-light', 'Pressure')] %}
           <article class="tile is-child notification {{ x[0] }} sensor-data-container">
             <p id="live-{{ '-'.join(x[1].lower().split(' ')) }}" class="title sensor-data">N/A</p>
             <p class="title">{{ x[1] }}</p>
@@ -37,7 +38,10 @@ window.onload = () => {
   const liveTiles = {
     'T': document.getElementById('live-temperature'),
     'HI': document.getElementById('live-heat-index'),
-    'RH': document.getElementById('live-humidity')
+    'RH': document.getElementById('live-humidity'),
+    'Light': document.getElementById('live-lux'),
+    'Rain': document.getElementById('live-rain'),
+    'P': document.getElementById('live-pressure'),
   }
 
   const liveCharts = new LiveCharts(data, liveTiles);

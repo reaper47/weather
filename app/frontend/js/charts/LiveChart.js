@@ -54,17 +54,15 @@ class LiveChart {
   }
 
   addDataPoint(time, y1, y2 = null) {
-    const y1Point = {x: time, y: y1};
-    this.__config.data.datasets[0].data.push(y1Point)
+    this.__config.data.labels.push(time)
+    this.__config.data.datasets[0].data.push(y1)
     
-    if (!!y2) {
-      const y2point = {x: time, y: y2};
-      this.__config.data.datasets[1].data.push(y2point)
-    }
+    if (y2)
+      this.__config.data.datasets[1].data.push(y2)
 
     this.chart.update()
   }
-  
+    
   labelRain(value) {
     if (value === 0) 
       return 'None';
@@ -74,6 +72,18 @@ class LiveChart {
       return 'Moderate';
     else if (value === 3)
       return 'Heavy';
+  }
+  
+  rainToNumber(value) {
+    console.log(value, this.__config);
+    if (value.localeCompare('N') === 0) 
+      return 0;
+    else if (value.localeCompare('L') === 0)
+      return 1;
+    else if (value.localeCompare('M') === 0)
+      return 2;
+    else if (value.localeCompare('H') === 0)
+      return 3;
   }
 
   changeTemperatureUnit(samples) {
