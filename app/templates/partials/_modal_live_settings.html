@@ -31,27 +31,18 @@
     </section>
     <footer class="modal-card-foot">
       <button id="save-live-settings" class="button is-success">Save changes</button>
-      <button class="button">Cancel</button>
+      <button id="cancel-live-settings" class="button">Cancel</button>
     </footer>
   </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const components = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'];
-  const displayComponents = components.map(el => document.getElementById(`display-${el}`));
-  const live = JSON.parse(window.localStorage.getItem('liveComponents'));
+  const liveTiles = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'];
 
-  displayLiveComponents(components, live);
-  for (let key in live) {
-    const i = components.indexOf(key);
-    displayComponents[i].checked = live[key];
-  }
+  updateLiveSettings(liveTiles);
+  updateLiveTiles(liveTiles);
 
-  document.getElementById('save-live-settings').addEventListener('mousedown', () => {
-    const liveComponents = {};
-    components.forEach((el, i) => liveComponents[el] = displayComponents[i].checked);
-    window.localStorage.setItem('liveComponents', JSON.stringify(liveComponents));
-    displayLiveComponents(components, liveComponents);
-  });
+  document.getElementById('save-live-settings').addEventListener('mousedown', () => saveLiveSettings(liveTiles));
+  document.getElementById('cancel-live-settings').addEventListener('click', () => updateLiveSettings(liveTiles));
 });
 </script>
