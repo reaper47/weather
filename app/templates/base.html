@@ -9,6 +9,7 @@
     <meta property="og:image" content="https://developer.cdn.mozilla.net/static/img/opengraph-logo.dc4e08e2f6af.png">
     <meta property="og:description" content="View the local weather in Quebec City">
     <link rel="shortcut icon" type="image/ico" href="/favicon.ico">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
     {% if title %}<title>{{ title }} - MacWeather</title>{% else %}<title>MacWeather</title>{% endif %}
     {% assets 'main_css' %}<link rel="stylesheet" href="{{ ASSET_URL }}">{% endassets %}
   </head>
@@ -46,6 +47,11 @@
           </div>
         </div>
         <div class="navbar-end">
+          <a id="live-settings-cog" class="navbar-item modal-button" data-target="modal-live-settings">
+            <span class="icon">
+              <i class="fas fa-cog"></i>
+            </span>
+          </a>
           <a class="navbar-item" href="{{ url_for('main.index') }}">Live</a>
           <a class="navbar-item" href="{{ url_for('main.index') }}">History</a>
           <a class="navbar-item" href="{{ url_for('main.index') }}">Predictions</a>

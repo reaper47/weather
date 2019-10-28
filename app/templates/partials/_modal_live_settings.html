@@ -1,0 +1,57 @@
+<div id="modal-live-settings" class="modal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Live Settings</p>
+      <button class="delete" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p class="subtitle has-text-centered">Display</p>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for component in ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'] %}
+          <tr>
+            <td>{{ component|title }}</td>
+            <td>
+              <div class="field">
+                <input id="display-{{ component }}" type="checkbox" class="switch is-rounded is-info" checked="checked">
+                <label for="display-{{ component }}"></label>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    <footer class="modal-card-foot">
+      <button id="save-live-settings" class="button is-success">Save changes</button>
+      <button class="button">Cancel</button>
+    </footer>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const components = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'];
+  const displayComponents = components.map(el => document.getElementById(`display-${el}`));
+  const live = JSON.parse(window.localStorage.getItem('liveComponents'));
+
+  displayLiveComponents(components, live);
+  for (let key in live) {
+    const i = components.indexOf(key);
+    displayComponents[i].checked = live[key];
+  }
+
+  document.getElementById('save-live-settings').addEventListener('mousedown', () => {
+    const liveComponents = {};
+    components.forEach((el, i) => liveComponents[el] = displayComponents[i].checked);
+    window.localStorage.setItem('liveComponents', JSON.stringify(liveComponents));
+    displayLiveComponents(components, liveComponents);
+  });
+});
+</script>

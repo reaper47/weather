@@ -8,13 +8,13 @@
         <div id="live-tile" class="tile is-parent is-2  is-vertical no-padding">
           {% for x in [('is-primary', 'Temperature'), ('is-danger', 'Heat Index'), ('is-link', 'Humidity'),
                        ('is-warning', 'Lux'), ('is-info', 'Rain'), ('is-light', 'Pressure')] %}
-          <article class="tile is-child notification {{ x[0] }} sensor-data-container">
-            <p id="live-{{ '-'.join(x[1].lower().split(' ')) }}" class="title sensor-data">N/A</p>
+          <article id="live-container-{{ '-'.join(x[1].split(' '))|lower }}" class="tile is-child notification {{ x[0] }} sensor-data-container">
+            <p id="live-{{ '-'.join(x[1].split(' '))|lower }}" class="title sensor-data">N/A</p>
             <p class="title">{{ x[1] }}</p>
           </article>
           {% endfor %}
         </div>
-        <div class="tile is-parent is-10 no-padding">
+        <div id="live-graph" class="tile is-parent is-10 no-padding">
           <article class="tile is-child notification is-dark">
             {% for x in ('temperature', 'temperature-humidity', 'humidity', 'heat-index',
                          'temperature-heat-index', 'heat-index-humidity', 'rain', 'light',
@@ -30,6 +30,7 @@
     </div>
   </div>
 </section>
+{% include 'partials/_modal_live_settings.html' %}
 <script>
 window.onload = () => {
   let data = {{ samples|tojson }};
