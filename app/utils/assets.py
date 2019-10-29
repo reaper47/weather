@@ -30,10 +30,16 @@ bundles = {
                       f'{JS}/charts/LiveChart_T_HI.js',
                       f'{JS}/charts/LiveChart_T_Rain.js',
                       f'{JS}/charts/LiveChart_T_Light.js',
+                      f'{JS}/charts/LiveChart_T_P.js',
                       f'{JS}/charts/LiveChart_HI_RH.js',
                       f'{JS}/charts/LiveChart_HI_Rain.js',
                       f'{JS}/charts/LiveChart_HI_Light.js',
+                      f'{JS}/charts/LiveChart_HI_P.js',
                       f'{JS}/charts/LiveChart_Light.js',
                       f'{JS}/charts/LiveChart_Light_RH.js',
+                      f'{JS}/charts/LiveChart_P.js',
+                      f'{JS}/charts/LiveChart_P_RH.js',
+                      f'{JS}/charts/LiveChart_P_Rain.js',
+                      f'{JS}/charts/LiveChart_P_Light.js',
                       filters='jsmin', output='gen/packed.js')
 }

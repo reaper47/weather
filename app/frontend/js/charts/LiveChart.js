@@ -75,7 +75,6 @@ class LiveChart {
   }
   
   rainToNumber(value) {
-    console.log(value, this.__config);
     if (value.localeCompare('N') === 0) 
       return 0;
     else if (value.localeCompare('L') === 0)

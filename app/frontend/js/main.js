@@ -47,7 +47,6 @@ function updateLiveTiles(tiles) {
 function updateLiveSettings(tiles) {
   const json = JSON.parse(window.localStorage.getItem('liveTiles'));
   const radios = tiles.map(el => document.getElementById(`display-${el}`));
-
   for (let key in json) {
     const i = tiles.indexOf(key);
     radios[i].checked = json[key];

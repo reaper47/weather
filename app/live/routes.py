@@ -5,13 +5,23 @@ from app.live import bp
 from app.models.sampling import get_samples_for_day, add_new_sample
 from app.utils.dto import Sample, DHT_Dto, DS18B20_Dto, FC37_Dto, TEMT6000_Dto, BME280_Dto, Averages_Dto
 
-graphs = [('temperature', 'Temperature'), ('heat-index', 'Heat Index'), ('humidity', 'Humidity'),
-          ('rain', 'Rain'), ('light', 'Light'), ('', ''), ('temperature-heat-index', 'Temperature + Heat Index'),
+"""graphs = [('temperature', 'Temperature'), ('heat-index', 'Heat Index'), ('humidity', 'Humidity'),
+          ('rain', 'Rain'), ('light', 'Light'), ('pressure', 'Pressure'), ('', ''),
+          ('temperature-heat-index', 'Temperature + Heat Index'),
           ('temperature-humidity', 'Temperature + Humidity'), ('temperature-rain', 'Temperature + Rain'),
-          ('temperature-light', 'Temperature + Light'), ('', ''),
-          ('heat-index-humidity', 'Heat Index + Humidity'), ('heat-index-rain', 'Heat Index + Rain'),
-          ('heat-index-light', 'Heat Index + Light'), ('', ''), ('rain-humidity', 'Rain + Humidity'),
-          ('rain-light', 'Rain + Light'), ('', ''), ('light-humidity', 'Light + Humidity')]
+          ('temperature-light', 'Temperature + Light'), ('temperature-pressure', 'Temperature + Pressure'),
+          ('', ''), ('heat-index-humidity', 'Heat Index + Humidity'), ('heat-index-rain', 'Heat Index + Rain'),
+          ('heat-index-light', 'Heat Index + Light'), ('heat-index-pressure', 'Heat Index + Pressure'), ('', ''),
+          ('rain-humidity', 'Rain + Humidity'), ('rain-light', 'Rain + Light'), ('', ''),
+          ('light-humidity', 'Light + Humidity'), ('', ''), ('pressure-humidity', 'Pressure + Humidity'),
+          ('pressure-rain', 'Pressure + Rain'), ('pressure-light', 'Pressure + Light')]
+"""
+graphs = ['temperature', 'heat-index', 'humidity', 'rain', 'light', 'pressure', '', 'temperature-heat-index',
+          'temperature-humidity', 'temperature-rain', 'temperature-light', 'temperature-pressure', '',
+          'heat-index-humidity', 'heat-index-rain', 'heat-index-light', 'heat-index-pressure', '',
+          'rain-humidity', 'rain-light', '', 'light-humidity', '', 'pressure-humidity', 'pressure-rain',
+          'pressure-light']
+
 
 
 @bp.route('/', methods=['GET', 'POST'])

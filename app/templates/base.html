@@ -32,14 +32,20 @@
           </div>
           <div class="navbar-item">
             <select id="live-chart-select">
-              <option value="{{ graphs[0][0] }}" selected="selected">{{ graphs[0][1] }}</option>
-              {% for value, label in graphs[1:] %}
-              {% if not value %}
+              <option value="{{ graphs[0] }}" selected="selected">{{ graphs[0]|title }}</option>
+              {%- for x in graphs[1:] -%}
+              {%- if not x -%}
               <option disabled>───────────────────</option>
-              {% else %}
-              <option value="{{ value }}">{{ label }}</option>
-              {% endif %}
-              {% endfor %}
+              {%- else -%}
+              <option value="{{ x }}">
+              {%- if 'heat' in x -%}
+              {{ ' + '.join(x.replace('heat-index', 'Heat Index').split('-'))|title }}
+              {%- else -%}
+              {{ ' + '.join(x.split('-'))|title }}
+              {%- endif -%}
+              </option>
+              {%- endif -%}
+              {%- endfor -%}
             </select>
           </div>
           <div class="navbar-item">
@@ -59,19 +65,19 @@
       </div>
     </nav>
     <main>
-      {% block page_content %}{% endblock %}
+      {%- block page_content -%}{%- endblock -%}
     </main>
-  </body>
-  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
-  {% assets 'main_js' %}<script defer src="{{ ASSET_URL }}"></script>{% endassets %}
-  <script>
-    const burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-    burgers.forEach(el => {
-      el.addEventListener('click', () => {
-        const target = document.getElementById(el.dataset.target);
-        el.classList.toggle('is-active');
-        target.classList.toggle('is-active');
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@2/dist/socket.io.js"></script>
+    {% assets 'main_js' %}<script defer src="{{ ASSET_URL }}"></script>{% endassets %}
+    <script>
+      const burgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+      burgers.forEach(el => {
+        el.addEventListener('click', () => {
+          const target = document.getElementById(el.dataset.target);
+          el.classList.toggle('is-active');
+          target.classList.toggle('is-active');
+        });
       });
-    });
-  </script>
+    </script>
+  </body>
 </html>
