@@ -51,21 +51,31 @@ window.onload = () => {
 
   // Establish the sockets
   const socket = io.connect(`http://${document.domain}:${location.port}`)
-  socket.on('update_graph', (sample) => liveCharts.updateGraph(sample));
-  socket.on('update_live', (sample) => liveCharts.updateLive(sample));
+  socket.on('update_graph', sample => liveCharts.updateGraph(sample));
+  socket.on('update_live', sample => liveCharts.updateLive(sample));
 
   // Event listeners
   const temperatureUnitSelect = document.getElementById('temperature-unit')
-  temperatureUnitSelect.addEventListener('change', (unit) => {
+  temperatureUnitSelect.selectedIndex = 0;
+  temperatureUnitSelect.addEventListener('change', unit => {
     const isCelsius = (unit.target.value.localeCompare('celsius') == 0);
     liveCharts.updateTemperatureUnit(isCelsius);
   });
 
   const liveChartSelect = document.getElementById('live-chart-select');
-  liveChartSelect.addEventListener('change', (type) => liveCharts.changeChart(type.target.value, liveZoomButton));
+  liveChartSelect.selectedIndex = 0;
+  liveChartSelect.addEventListener('change', opt => liveCharts.changeChart(opt.target.value, liveZoomButton));
+
+  const liveSensorsTemperatureSelect = document.getElementById('live-sensors-temperature').firstElementChild;
+  liveSensorsTemperatureSelect.addEventListener('change', opt => liveCharts.changeSensorT(opt.target.value));
+
+  const liveSensorsHumiditySelect = document.getElementById('live-sensors-humidity').firstElementChild;
+  liveSensorsTemperatureSelect.selectedIndex = 0;
+  liveSensorsHumiditySelect.addEventListener('change', opt => liveCharts.changeSensorRH(opt.target.value));
 
   const liveZoomButton = document.getElementById('live-zoom-button');
-  liveZoomButton.addEventListener('mousedown', (click) => liveCharts.zoomChart(click.target));
+  liveSensorsHumiditySelect.selectedIndex = 0;
+  liveZoomButton.addEventListener('mousedown', click => liveCharts.zoomChart(click.target));
 }
 </script>
 {% endblock %}

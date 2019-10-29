@@ -84,6 +84,16 @@ class LiveChart {
     else if (value.localeCompare('H') === 0)
       return 3;
   }
+  
+  changeDataset(y1 = null, y2 = null) {
+    if (y1)
+      this.__config.data.datasets[0].data = y1;
+    
+    if (y2)
+      this.__config.data.datasets[1].data = y2;
+    
+    this.chart.update();
+  }
 
   changeTemperatureUnit(samples) {
     this.__config.data.datasets[0].data = samples;

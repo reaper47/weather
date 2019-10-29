@@ -30,6 +30,9 @@ class LiveCharts {
     this.isCelsius = true;
     this.dates = data['dates'];
     
+    this.temperatureSelectContainer = document.getElementById('live-sensors-temperature');
+    this.humiditySelectContainer = document.getElementById('live-sensors-humidity');
+    
     this.currentChart = this.charts['T'];
     this.chartLookupTable = {
       'temperature': this.charts['T'],
@@ -70,6 +73,57 @@ class LiveCharts {
     });
 
     this.currentChart.show();
+    this.toggleSensorSelect(chart);
+  }
+  
+  toggleSensorSelect(chart) {
+    const isTemperature = chart.includes('temperature');
+    const isHumidity = chart.includes('humidity');
+  
+    if (isTemperature && isHumidity) {
+      this.temperatureSelectContainer.classList.remove('hide');
+      this.humiditySelectContainer.classList.remove('hide');
+    } else if (isTemperature) {
+      this.temperatureSelectContainer.classList.remove('hide');
+      this.humiditySelectContainer.classList.add('hide');
+    } else if (isHumidity) {
+      this.temperatureSelectContainer.classList.add('hide');
+      this.humiditySelectContainer.classList.remove('hide');
+    } else {
+      this.temperatureSelectContainer.classList.add('hide');
+      this.humiditySelectContainer.classList.add('hide');
+    }
+  }
+  
+  changeSensorT(sensor) {
+    const charts = ['T', 'HI', 'T_RH', 'T_Rain', 'T_Light', 'T_P', 'T_HI'];  
+
+    if (sensor.includes('dht')) {
+      const temperatures = this.isCelsius ? this.data.DHT.T_C : this.data.DHT.T_F;
+      charts.forEach(chart => this.charts[chart].changeDataset(temperatures));
+    } else if (sensor.includes('ds18')) {
+      const temperatures = this.isCelsius ? this.data.DS18B20.T_C : this.data.DS18B20.T_F;
+      charts.forEach(chart => this.charts[chart].changeDataset(temperatures));
+    } else if (sensor.includes('bme')) {
+      const temperatures = this.isCelsius ? this.data.BME280.T_C : this.data.BME280.T_F;
+      charts.forEach(chart => this.charts[chart].changeDataset(temperatures));
+      this.charts['T_HI'].changeDataset(temperatures);
+    } else {
+      const temperatures = this.isCelsius ? this.data.Averages.T_C : this.data.Averages.T_F;
+      charts.forEach(chart => this.charts[chart].changeDataset(temperatures));
+    }
+  }
+  
+  changeSensorRH(sensor) {
+    const charts = ['Rain_RH', 'Light_RH', 'P_RH', 'T_HI', 'T_RH', 'HI_RH'];
+    
+    if (sensor.includes('dht')) {
+      this.charts['RH'].changeDataset(this.data.DHT.RH);
+      charts.forEach(chart => this.charts[chart].changeDataset(null, this.data.DHT.RH));
+    } else if (sensor.includes('bme')) {
+      this.charts['RH'].changeDataset(this.data.BME280.RH);
+      charts.forEach(chart => this.charts[chart].changeDataset(null, this.data.BME280.RH));
+    }
   }
   
   updateGraph(sample) {
@@ -101,10 +155,6 @@ class LiveCharts {
       this.charts['HI_P'].addDataPoint(date_, sample.DHT.HI_F, sample.BME280.P);
     }
     
-    this.dates.push(date_);
-    this.data.Averages.T_C.push(sample['T']['C']);
-    this.data.Averages.T_F.push(sample['T']['F']);
-    
     this.charts['RH'].addDataPoint(date_, sample.DHT.RH);
     this.charts['Rain'].addDataPoint(date_, sample.FC37.rain);
     this.charts['Light'].addDataPoint(date_, sample.TEMT6000.lux);
@@ -115,6 +165,8 @@ class LiveCharts {
     this.charts['P_RH'].addDataPoint(date_, sample.BME280.P, sample.DHT.RH);
     this.charts['P_Rain'].addDataPoint(date_, sample.BME280.P, sample.FC37.rain);
     this.charts['P_Light'].addDataPoint(date_, sample.BME280.P, sample.TEMT6000.lux);
+    
+    this.dates.push(date_);
   }
   
   updateLive(new_sample) {

@@ -48,6 +48,19 @@
               {%- endfor -%}
             </select>
           </div>
+          <div id="live-sensors-temperature" class="navbar-item">
+            <select>
+              {%- for x in ['Average', 'DHT22', 'DS18B20', 'BME280'] -%}
+              <option value="{{ x|lower }}">{{ x }}</option>
+              {%- endfor -%}
+            </select>
+          </div>
+          <div id="live-sensors-humidity" class="navbar-item hide">
+            <select>
+              <option value="dht22">DHT22</option>
+              <option value="bme280">BME280</option>
+            </select>
+          </div>
           <div class="navbar-item">
             <a id="live-zoom-button" class="button">Zoom</a>
           </div>
