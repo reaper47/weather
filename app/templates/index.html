@@ -55,6 +55,8 @@ window.onload = () => {
   socket.on('update_live', sample => liveCharts.updateLive(sample));
 
   // Event listeners
+  refreshAtMidnightTimer();
+
   const temperatureUnitSelect = document.getElementById('temperature-unit')
   temperatureUnitSelect.selectedIndex = 0;
   temperatureUnitSelect.addEventListener('change', unit => {

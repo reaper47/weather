@@ -52,3 +52,16 @@ function updateLiveSettings(tiles) {
     radios[i].checked = json[key];
   }
 }
+
+function refreshAtMidnightTimer() {
+  (function loop() {
+    let now = new Date();
+    const minutes = now.getMinutes();
+    console.log(now);
+    if (now.getHours() === 0 && minutes >= 0 && minutes <= 10)
+      location.reload();
+    now = new Date();
+    const delay = 450000 - (now % 450000);
+    setTimeout(loop, delay);
+  })();
+}
