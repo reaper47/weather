@@ -166,7 +166,23 @@ class LiveCharts {
     this.charts['P_Rain'].addDataPoint(date_, sample.BME280.P, sample.FC37.rain);
     this.charts['P_Light'].addDataPoint(date_, sample.BME280.P, sample.TEMT6000.lux);
     
+    // Add new sample to data
     this.dates.push(date_);
+    this.data.DHT.T_C.push(sample.DHT.T_C);
+    this.data.DHT.T_F.push(sample.DHT.T_F);
+    this.data.DHT.RH.push(sample.DHT.RH);
+    this.data.DHT.HI_C.push(sample.DHT.HI_C);
+    this.data.DHT.HI_F.push(sample.DHT.HI_F);
+    this.data.FC37.Rain.push(sample.FC37.rain);
+    this.data.TEMT6000.Light.push(sample.TEMT6000.lux);
+    this.data.DS18B20.T_C.push(sample.DS18B20.T_C);
+    this.data.DS18B20.T_F.push(sample.DS18B20.T_F);
+    this.data.BME280.T_C.push(sample.BME280.T_C);
+    this.data.BME280.T_F.push(sample.BME280.T_F);
+    this.data.BME280.RH.push(sample.BME280.RH);
+    this.data.BME280.P.push(sample.BME280.P);
+    this.data.Averages.T_C.push(sample.T.C);
+    this.data.Averages.T_F.push(sample.T.F);
   }
   
   updateLive(new_sample) {
