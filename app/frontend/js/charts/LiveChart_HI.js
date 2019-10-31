@@ -45,7 +45,7 @@ class LiveChart_HI extends LiveChart {
       }
     }
   }
-  
+
   unzoom() {
     super.unzoom(0, 100);
   }

@@ -61,7 +61,7 @@ class LiveChart_P_Rain extends LiveChart {
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
-              min: 0, 
+              min: 0,
               max: 10,
               fontColor: 'rgba(255, 255, 255, 0.7)',
               callback: (value) => super.labelRain(value),
@@ -77,16 +77,21 @@ class LiveChart_P_Rain extends LiveChart {
       }
     }
   }
-  
+
   addDataPoint(time, y1, y2) {
     super.addDataPoint(time, y1, super.rainToNumber(y2));
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
-    super.unzoom(90000, 110000, true, 0, 4);
+    if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('mbar'))
+      super.unzoom(900, 1100, true, 0, 4);
+    else if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('kPa'))
+      super.unzoom(90, 110, true, 0, 4);
+    else
+      super.unzoom(90000, 110000, true, 0, 4);
   }
 }

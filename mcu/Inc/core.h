@@ -10,9 +10,9 @@
 #include "fc37.h"
 #include "temt600.h"
 
-#define SSID      "VIDEOTRON6379"
-#define PASSWORD  "XY7XY7VCW3UVV"
-#define ADDRESS   "192.168.0.170"
+#define SSID      " "
+#define PASSWORD  " "
+#define ADDRESS   "192.168.0.171"
 #define PORT      8090
 #define TYPE	  TCP
 

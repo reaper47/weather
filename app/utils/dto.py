@@ -32,7 +32,9 @@ class BME280_Dto:
     t_c: float
     t_f: float
     humidity: float
-    pressure: float
+    pa: float
+    kpa: float
+    mb: int
 
 
 @dataclass

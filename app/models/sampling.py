@@ -7,6 +7,8 @@ from sqlalchemy.schema import UniqueConstraint
 
 
 class Station(db.Model):
+    __tablename__ = 'station'
+
     id = db.Column(db.Integer, primary_key=True)
     lat = db.Column(db.Float, nullable=False)
     lng = db.Column(db.Float, nullable=False)
@@ -25,6 +27,8 @@ class Station(db.Model):
 
 
 class Temperature(db.Model):
+    __tablename__ = 'temperature'
+
     id = db.Column(db.Integer, primary_key=True)
     celsius = db.Column(db.Float, nullable=False)
     fahrenheit = db.Column(db.Float, nullable=False)
@@ -47,6 +51,8 @@ class Temperature(db.Model):
 
 
 class HeatIndex(db.Model):
+    __tablename__ = 'heat_index'
+
     id = db.Column(db.Integer, primary_key=True)
     celsius = db.Column(db.Float, nullable=False)
     fahrenheit = db.Column(db.Float, nullable=False)
@@ -57,8 +63,9 @@ class HeatIndex(db.Model):
         self.fahrenheit = fahrenheit
 
     def __eq__(self, other):
-        return (self.celsius == other.celsius and
-                self.fahrenheit == other.fahrenheit)
+        celsius_result = math.fabs(self.celsius - other.celsius)
+        fahrenheit_result = math.fabs(self.fahrenheit - other.fahrenheit)
+        return celsius_result <= 0.001 and fahrenheit_result <= 0.001
 
     def __hash__(self):
         return hash(self.celsius)
@@ -67,7 +74,35 @@ class HeatIndex(db.Model):
         return f'<Heat Index #{self.id}: [{self.celsius},{self.fahrenheit}]>'
 
 
+class Pressure(db.Model):
+    __tablename__ = 'pressure'
+
+    id = db.Column(db.Integer, primary_key=True)
+    pascal = db.Column(db.Float, nullable=False)
+    kilopascal = db.Column(db.Float, nullable=False)
+    mbar = db.Column(db.Integer, nullable=False)
+    __table_args__ = (UniqueConstraint('pascal', 'kilopascal', 'mbar', name='unique_pressure'),)
+
+    def __init__(self, pa, kpa, mb):
+        self.pascal = pa
+        self.kilopascal = kpa
+        self.mbar = mb
+
+    def __eq__(self, other):
+        pascal_result = math.fabs(self.pascal - other.pascal)
+        kilopascal_result = math.fabs(self.kilopascal - other.kilopascal)
+        return pascal_result <= 0.001 and kilopascal_result <= 0.001 and self.mbar == other.mbar
+
+    def __hash__(self):
+        return hash(self.pascal)
+
+    def __repr__(self):
+        return f'<Pressure #{self.id}: [{self.pascal},{self.kilopascal},{self.mbar}]'
+
+
 class DHT(db.Model):
+    __tablename__ = 'dht'
+
     id = db.Column(db.Integer, primary_key=True)
     station_id = db.Column(db.Integer, db.ForeignKey('station.id'))
     station = db.relationship('Station', backref='dht_station', uselist=False)
@@ -97,6 +132,8 @@ class DHT(db.Model):
 
 
 class DS18B20(db.Model):
+    __tablename__ = 'ds18b20'
+
     id = db.Column(db.Integer, primary_key=True)
     temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
     temperature = db.relationship('Temperature', backref='ds18b20_temperature', uselist=False)
@@ -116,6 +153,8 @@ class DS18B20(db.Model):
 
 
 class FC37(db.Model):
+    __tablename__ = 'fc37'
+
     id = db.Column(db.Integer, primary_key=True)
     rain = db.Column(db.CHAR(length=1), nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -134,6 +173,8 @@ class FC37(db.Model):
 
 
 class TEMT6000(db.Model):
+    __tablename__ = 'temt6000'
+
     id = db.Column(db.Integer, primary_key=True)
     lux = db.Column(db.Integer, nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -152,11 +193,14 @@ class TEMT6000(db.Model):
 
 
 class BME280(db.Model):
+    __tablename__ = 'bme280'
+
     id = db.Column(db.Integer, primary_key=True)
     temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
     temperature = db.relationship('Temperature', backref='bme280_temperature', uselist=False)
     humidity = db.Column(db.Float, nullable=False)
-    pressure = db.Column(db.Float, nullable=False)
+    pressure_id = db.Column(db.Integer, db.ForeignKey('pressure.id'))
+    pressure = db.relationship('Pressure', backref='bme280_pressure', uselist=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __eq__(self, other):
@@ -177,6 +221,8 @@ class BME280(db.Model):
 
 
 class Averages(db.Model):
+    __tablename__ = 'averages'
+
     id = db.Column(db.Integer, primary_key=True)
     temperature_id = db.Column(db.Integer, db.ForeignKey('temperature.id'))
     temperature = db.relationship('Temperature', backref='averages_temperature', uselist=False)
@@ -192,7 +238,7 @@ def get_samples_for_day(date):
         'DS18B20': {'T_C': [], 'T_F': []},
         'FC37': {'Rain': []},
         'TEMT6000': {'Light': []},
-        'BME280': {'T_C': [], 'T_F': [], 'RH': [], 'P': []},
+        'BME280': {'T_C': [], 'T_F': [], 'RH': [], 'P_Pa': [], 'P_kPa': [], 'P_mb': []},
         'Averages': {'T_C': [], 'T_F': []},
         'dates': []
     }
@@ -220,7 +266,9 @@ def get_samples_for_day(date):
     data['BME280']['T_C'] = [x.temperature.celsius for x in samples]
     data['BME280']['T_F'] = [x.temperature.fahrenheit for x in samples]
     data['BME280']['RH'] = [x.humidity for x in samples]
-    data['BME280']['P'] = [x.pressure for x in samples]
+    data['BME280']['P'] = [x.pressure.pascal for x in samples]
+    data['BME280']['P_kPa'] = [x.pressure.kilopascal for x in samples]
+    data['BME280']['P_mb'] = [x.pressure.mbar for x in samples]
 
     samples = Averages.query.filter(Averages.date.between(day_start, day_end)).all()
     data['Averages']['T_C'] = [x.temperature.celsius for x in samples]
@@ -242,8 +290,8 @@ def add_new_sample(sample: Sample):
     temt6000 = TEMT6000(lux=sample.temt6000.lux, date=sample.date)
 
     t = find_temperature(Temperature, sample.bme280.t_c, sample.bme280.t_f)
-    bme280 = BME280(temperature=t, humidity=sample.bme280.humidity,
-                    pressure=sample.bme280.pressure, date=sample.date)
+    p = find_pressure(sample.bme280.pa, sample.bme280.kpa, sample.bme280.mb)
+    bme280 = BME280(temperature=t, humidity=sample.bme280.humidity, pressure=p, date=sample.date)
 
     t = find_temperature(Temperature, sample.averages.t_c, sample.averages.t_f)
     averages = Averages(temperature=t, date=sample.date)
@@ -260,6 +308,20 @@ def find_temperature(Entity, celsius, fahrenheit):
         entry = None
 
     if entry is None:
-        entry = Entity(celsius=celsius, fahrenheit=fahrenheit)
+        entry = Entity(celsius, fahrenheit)
+        commit(entry)
+    return entry
+
+
+def find_pressure(pascal, kilopascal, mbar):
+    for x in Pressure.query.all():
+        if x == Pressure(pascal, kilopascal, mbar):
+            entry = x
+            break
+    else:
+        entry = None
+
+    if entry is None:
+        entry = Pressure(pascal, kilopascal, mbar)
         commit(entry)
     return entry

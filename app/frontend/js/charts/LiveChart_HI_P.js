@@ -60,8 +60,8 @@ class LiveChart_HI_P extends LiveChart {
             },
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
-              suggestedMin: 0,
-              suggestedMax: 100,
+              suggestedMin: 90000,
+              suggestedMax: 110000,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -80,6 +80,11 @@ class LiveChart_HI_P extends LiveChart {
   }
   
   unzoom() {
-    super.unzoom(0, 100, true, 90000, 110000);
+    if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('mbar'))
+      super.unzoom(0, 100, true, 900, 1100);
+    else if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('kPa'))
+      super.unzoom(0, 100, true, 90, 110);
+    else
+      super.unzoom(0, 100, true, 90000, 110000);
   }
 }

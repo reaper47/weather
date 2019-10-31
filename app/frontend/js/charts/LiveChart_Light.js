@@ -45,7 +45,7 @@ class LiveChart_Light extends LiveChart {
       }
     }
   }
-  
+
   unzoom() {
     super.unzoom(0, 1000);
   }

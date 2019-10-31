@@ -6,7 +6,7 @@ class LiveChart {
   }
 
   __baseConfig() {
-    return { 
+    return {
       options: {
         scales: {
           xAxes: [{
@@ -33,7 +33,7 @@ class LiveChart {
           if (chart.tooltip._active && chart.tooltip._active.length) {
             const activePoint = chart.tooltip._active[0]
             let y_axis = chart.scales[Object.keys(chart.scales)[1]];
-              
+
             const x = activePoint.tooltipPosition().x
             this.__ctx.save();
             this.__ctx.beginPath();
@@ -56,15 +56,15 @@ class LiveChart {
   addDataPoint(time, y1, y2 = null) {
     this.__config.data.labels.push(time)
     this.__config.data.datasets[0].data.push(y1)
-    
+
     if (y2)
       this.__config.data.datasets[1].data.push(y2)
 
     this.chart.update()
   }
-    
+
   labelRain(value) {
-    if (value === 0) 
+    if (value === 0)
       return 'None';
     else if (value === 1)
       return 'Light';
@@ -73,9 +73,9 @@ class LiveChart {
     else if (value === 3)
       return 'Heavy';
   }
-  
+
   rainToNumber(value) {
-    if (value.localeCompare('N') === 0) 
+    if (value.localeCompare('N') === 0)
       return 0;
     else if (value.localeCompare('L') === 0)
       return 1;
@@ -84,58 +84,84 @@ class LiveChart {
     else if (value.localeCompare('H') === 0)
       return 3;
   }
-  
+
   changeDataset(y1 = null, y2 = null) {
     if (y1)
       this.__config.data.datasets[0].data = y1;
-    
+
     if (y2)
       this.__config.data.datasets[1].data = y2;
-    
+
     this.chart.update();
   }
 
   changeTemperatureUnit(samples) {
     this.__config.data.datasets[0].data = samples;
-    
+
     const ylabel = this.__config.options.scales.yAxes[0].scaleLabel.labelString;
     if (ylabel.includes('°C'))
       this.__config.options.scales.yAxes[0].scaleLabel.labelString = 'Temperature (°F)';
     else
       this.__config.options.scales.yAxes[0].scaleLabel.labelString = 'Temperature (°C)';
-      
+
     this.chart.update();
   }
-  
+
+  changePressureUnit(samples, isy1, newlabel, unit) {
+    const i = isy1 ? 0 : 1;
+    this.__config.data.datasets[i].data = samples;
+    this.__config.options.scales.yAxes[i].scaleLabel.labelString = newlabel;
+
+    let ticks = this.__config.options.scales.yAxes[i].ticks;
+    if (ticks.hasOwnProperty('suggestedMin')) {
+      if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('mbar')) {
+        ticks.suggestedMin = 900;
+        ticks.suggestedMax = 1100;
+      } else if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('kPa')) {
+        ticks.suggestedMin = 90;
+        ticks.suggestedMax = 110;
+      } else {
+        ticks.suggestedMin = 90000;
+        ticks.suggestedMax = 110000;
+      }
+    }
+
+    this.chart.update();
+  }
+
   show() {
     this.__container.classList.remove('hide')
   }
-  
+
   hide() {
     this.__container.classList.add('hide')
   }
-  
+
   zoom(multipleYAxis = false) {
     delete this.__config.options.scales.yAxes[0].ticks.suggestedMin;
     delete this.__config.options.scales.yAxes[0].ticks.suggestedMax;
-    
+
     if (multipleYAxis) {
       delete this.__config.options.scales.yAxes[1].ticks.suggestedMin;
       delete this.__config.options.scales.yAxes[1].ticks.suggestedMax;
     }
-    
+
     this.chart.update();
   }
-  
+
   unzoom(min, max, multipleYAxis = false, min2, max2) {
     this.__config.options.scales.yAxes[0].ticks.suggestedMin = min;
     this.__config.options.scales.yAxes[0].ticks.suggestedMax = max;
-    
+
     if (multipleYAxis) {
       this.__config.options.scales.yAxes[1].ticks.suggestedMin = min2;
       this.__config.options.scales.yAxes[1].ticks.suggestedMax = max2;
     }
-    
+
     this.chart.update();
+  }
+
+  getId() {
+    return this.__liveChartID;
   }
 }

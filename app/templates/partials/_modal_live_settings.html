@@ -9,7 +9,7 @@
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
           <tr>
-            <th>Component</th>
+            <th>Live Tile</th>
             <th>Show</th>
           </tr>
         </thead>
@@ -27,6 +27,42 @@
           {%- endfor -%}
         </tbody>
       </table>
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>Unit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Temperature</td>
+            <td>
+              <div class="field">
+                <select id="temperature-unit">
+                  <option value="celsius">Celsius</option>
+                  <option value="fahrenheit">Fahrenheit</option>
+                </select>
+                <label for="temperature-unit"></label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Pressure</td>
+            <td>
+              <div class="field">
+                <select id="pressure-unit">
+                {%- for val, label in [('pascal', 'Pascal (Pa)'), ('kilopascal', 'Kilopascal (kPa)'),
+                                       ('mbar', 'Millibar (mbar)')] -%}
+                  <option value="{{ val }}">{{ label }}</option>
+                {%- endfor -%}
+                </select>
+                <label for="pressure-unit"></label>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </section>
     <footer class="modal-card-foot">
       <button id="save-live-settings" class="button is-success">Save changes</button>
@@ -34,16 +70,3 @@
     </footer>
   </div>
 </div>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const liveTiles = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'];
-
-  if (window.localStorage.getItem('liveTiles')) {
-    updateLiveSettings(liveTiles);
-    updateLiveTiles(liveTiles);
-  }
-
-  document.getElementById('save-live-settings').addEventListener('mousedown', () => saveLiveSettings(liveTiles));
-  document.getElementById('cancel-live-settings').addEventListener('click', () => updateLiveSettings(liveTiles));
-});
-</script>

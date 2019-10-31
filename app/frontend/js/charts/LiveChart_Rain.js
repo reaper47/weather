@@ -44,11 +44,11 @@ class LiveChart_Rain extends LiveChart {
       }
     }
   }
-  
+
   addDataPoint(time, y1) {
     super.addDataPoint(time, super.rainToNumber(y1));
   }
-    
+
   unzoom() {
     super.unzoom(0, 3);
   }

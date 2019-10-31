@@ -60,7 +60,7 @@ class LiveChart_P_RH extends LiveChart {
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
-              suggestedMin: 0, 
+              suggestedMin: 0,
               suggestedMax: 100,
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
@@ -75,12 +75,17 @@ class LiveChart_P_RH extends LiveChart {
       }
     }
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
-    super.unzoom(90000, 110000, true, 0, 100);
+    if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('mbar'))
+      super.unzoom(900, 1100, true, 0, 100);
+    else if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('kPa'))
+      super.unzoom(90, 110, true, 0, 100);
+    else
+      super.unzoom(90000, 110000, true, 0, 100);
   }
 }

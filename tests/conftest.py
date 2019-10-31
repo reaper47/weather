@@ -1,7 +1,7 @@
 import json
 import pytest
 from app import create_app, db
-from app.models.sampling import Station, DHT, DS18B20, FC37, TEMT6000, BME280, Temperature, HeatIndex
+from app.models.sampling import Station, DHT, DS18B20, FC37, TEMT6000, BME280, Temperature, HeatIndex, Pressure
 from app.utils.database import commit
 
 A_STATION_NAME = 'Home - Backyard'
@@ -11,13 +11,15 @@ A_HEAT_INDEX_C = 25.5
 A_HEAT_INDEX_F = 70.5
 A_HUMIDITY = 56.0
 A_LUX = 333
-A_PRESSURE = 100170
+A_PRESSURE = 100170.0
+A_PRESSURE_KPA = 100.2
+A_PRESSURE_MB = 1002
 
 A_JSON_SAMPLE = json.dumps({
     'DHT': {'station_id': 1, 'RH': 51.3, 'T_C': 21.9, 'T_F': 71.4, 'HI_C': 21.5, 'HI_F': 70.7},
     'DS18B20': {0: {'T_C': 21.81, 'T_F': 71.26}}, 'FC37': {'rain': 'N'},
     'TEMT600': {'lux': 7},
-    'BME280': {'H_C': 21.67, 'H_F': 71.01, 'RH': 41.05, 'P': 100297.2},
+    'BME280': {'H_C': 21.67, 'H_F': 71.01, 'RH': 41.05, 'P': 100297.2, 'P_kPa': 100.3, 'P_mb': 1003},
     'T': {'C': 21.8, 'F': 71.23}
 })
 
@@ -35,8 +37,8 @@ def test_client():
 @pytest.fixture(scope='function')
 def init_database():
     db.create_all()
-    commit([Temperature(celsius=A_TEMPERATURE_C, fahrenheit=A_TEMPERATURE_F),
-            HeatIndex(celsius=A_HEAT_INDEX_C, fahrenheit=A_HEAT_INDEX_F)])
+    commit([Temperature(A_TEMPERATURE_C, A_TEMPERATURE_F), HeatIndex(A_HEAT_INDEX_C, A_HEAT_INDEX_F),
+            Pressure(A_PRESSURE, A_PRESSURE_KPA, A_PRESSURE_MB)])
     yield db
     db.session.remove()
     db.drop_all()
@@ -52,6 +54,11 @@ def a_station(test_client, init_database):
 @pytest.fixture(scope='function')
 def a_temperature(test_client, init_database):
     return Temperature.query.all()[0]
+
+
+@pytest.fixture(scope='function')
+def a_pressure(test_client, init_database):
+    return Pressure.query.all()[0]
 
 
 @pytest.fixture(scope='function')
@@ -88,7 +95,7 @@ def a_temt6000(test_client, init_database):
 
 
 @pytest.fixture(scope='function')
-def a_bme280(test_client, init_database, a_temperature):
-    bme280 = BME280(temperature=a_temperature, humidity=A_HUMIDITY, pressure=A_PRESSURE)
+def a_bme280(test_client, init_database, a_temperature, a_pressure):
+    bme280 = BME280(temperature=a_temperature, humidity=A_HUMIDITY, pressure=a_pressure)
     commit(bme280)
     return BME280.query.all()[0]

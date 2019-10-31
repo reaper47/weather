@@ -46,7 +46,7 @@ class LiveChart_RH extends LiveChart {
       }
     }
   }
-  
+
   unzoom() {
     super.unzoom(0, 100);
   }

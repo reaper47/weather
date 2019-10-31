@@ -73,24 +73,24 @@ class LiveChart_T_HI extends LiveChart {
       }
     }
   }
-  
+
   changeTemperatureUnit(samples, heatIndexSamples) {
     super.changeTemperatureUnit(samples);
     this.__config.data.datasets[1].data = heatIndexSamples;
-    
+
     const heatLabel = this.__config.options.scales.yAxes[1].scaleLabel.labelString;
     if (heatLabel.includes('°C'))
       this.__config.options.scales.yAxes[1].scaleLabel.labelString = 'Heat Index (°F)';
     else
       this.__config.options.scales.yAxes[1].scaleLabel.labelString = 'Heat Index (°C)';
-    
+
     this.chart.update();
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
     super.unzoom(0, 100, true, 0, 100);
   }

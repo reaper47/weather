@@ -60,7 +60,7 @@ class LiveChart_T_Rain extends LiveChart {
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
-              min: 0, 
+              min: 0,
               max: 10,
               fontColor: 'rgba(255, 255, 255, 0.7)',
               callback: (value) => super.labelRain(value),
@@ -76,15 +76,15 @@ class LiveChart_T_Rain extends LiveChart {
       }
     }
   }
-  
+
   addDataPoint(time, y1, y2) {
     super.addDataPoint(time, y1, super.rainToNumber(y2));
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
     super.unzoom(0, 100, true, 0, 4);
   }

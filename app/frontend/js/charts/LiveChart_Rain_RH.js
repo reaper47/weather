@@ -76,15 +76,15 @@ class LiveChart_Rain_RH extends LiveChart {
       }
     }
   }
-  
+
   addDataPoint(time, y1, y2) {
     super.addDataPoint(time, super.rainToNumber(y1), y2);
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
     super.unzoom(0, 4, true, 0, 100);
   }

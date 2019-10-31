@@ -73,11 +73,11 @@ class LiveChart_T_RH extends LiveChart {
       }
     }
   }
-  
+
   zoom() {
     super.zoom(true);
   }
-  
+
   unzoom() {
     super.unzoom(0, 100, true, 0, 100);
   }
