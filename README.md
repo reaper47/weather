@@ -1,9 +1,19 @@
 # Weather Station
 
+[[ Image of the app in action! ]]
+
 *Your personal weather station solution*
 
-## Overview
+Have you ever wished to have a weather station in your backyard where you can check the weather on a beautiful interface without having to leave the couch? If so, this is for you. 
 
+The station takes temperature, heat index, humidity, rain, light and pressure measurements on a regular basis defined by you. The data from the station is transmitted to your server by WiFi. Your server will store the data in your database, and will send a live update to your browser.
+
+## Features
+
+* Clean interface focused on your data
+* Live tiles for every measurement
+* Graphs of Time vs Measurement for the entire day
+* Choose between imperial and metric units
 
 ## Installation
 
@@ -74,13 +84,15 @@ You can now access the web interface through your browser.
 
 ## Contributing
 
+Send me [an email](mailto:macpoule@gmail.com) or open [an issue](https://github.com/reaper47/weather/issues) for any of the following points.
 
-## Credits
+* Do you wish your station had a sensor not currently supported? 
+* Have you discovered any bugs?
+* Is there a feature you wish your station had?
+* Do you have any general improvement ideas?
+* Is there something that bugs you?
 
-Credits are due to:
-
-1. Bosch for their [BME280 driver](https://github.com/BoschSensortec/BME280_driver)
-1. Lamik for his [STM32F4 DS18B20 driver](https://github.com/lamik/DS18B20_STM32_HAL)
+Feel free to contribute to this project! All ideas are welcome.
 
 ### Arduino Support
 
@@ -91,3 +103,13 @@ There is no support for Arduino yet. However, it should be easy to port from the
 - [ ] Add a wind sensor
 - [ ] Develop a history module to display the weather over a specific frame
 - [ ] Develop a prediction module to predict the weather based on the data stored in the database
+- [ ] Check whether simplifying the installation down to an executable is a good idea
+- [ ] Improve the firwre with power management
+- [ ] Find a way to transmit the data with a way other than WiFi
+
+## Credits
+
+Credits are due to:
+
+1. Bosch for their [BME280 driver](https://github.com/BoschSensortec/BME280_driver)
+1. Lamik for his [STM32F4 DS18B20 driver](https://github.com/lamik/DS18B20_STM32_HAL)
