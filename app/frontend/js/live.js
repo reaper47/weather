@@ -140,8 +140,6 @@ class LiveCharts {
       'P': this.__getPressureSensorSample(sample)
     };
 
-    console.log(sample, vals)
-
     this.charts['T'].addDataPoint(date_, vals.T),
     this.charts['HI'].addDataPoint(date_, vals.HI),
     this.charts['RH'].addDataPoint(date_, vals.RH),
@@ -263,12 +261,12 @@ class LiveCharts {
 
     const chartsT = ['T', 'T_RH', 'T_Rain', 'T_Light', 'T_P'];
     const samples = isCelsius ? this.data.Averages.T_C : this.data.Averages.T_F;
-    chartsT.forEach(chart => this.charts[chart].changeTemperatureUnit(samples));
+    chartsT.forEach(chart => this.charts[chart].changeTemperatureUnit(samples, 'Temperature ', isCelsius));
 
     const chartsHI = ['HI', 'HI_RH', 'HI_Rain', 'HI_Light', 'HI_P']
     const heatIndexSamples = isCelsius ? this.data.DHT.HI_C : this.data.DHT.HI_F;
-    chartsHI.forEach(chart => this.charts[chart].changeTemperatureUnit(heatIndexSamples));
-    this.charts['T_HI'].changeTemperatureUnit(samples, heatIndexSamples);
+    chartsHI.forEach(chart => this.charts[chart].changeTemperatureUnit(heatIndexSamples, 'Heat Index ', isCelsius));
+    this.charts['T_HI'].changeTemperatureUnit(samples, heatIndexSamples, isCelsius);
   }
 
   updatePressureUnit(unit) {

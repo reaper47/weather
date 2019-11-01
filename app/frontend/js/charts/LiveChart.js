@@ -95,15 +95,9 @@ class LiveChart {
     this.chart.update();
   }
 
-  changeTemperatureUnit(samples) {
+  changeTemperatureUnit(samples, base, isCelsius) {
     this.__config.data.datasets[0].data = samples;
-
-    const ylabel = this.__config.options.scales.yAxes[0].scaleLabel.labelString;
-    if (ylabel.includes('°C'))
-      this.__config.options.scales.yAxes[0].scaleLabel.labelString = 'Temperature (°F)';
-    else
-      this.__config.options.scales.yAxes[0].scaleLabel.labelString = 'Temperature (°C)';
-
+    this.__config.options.scales.yAxes[0].scaleLabel.labelString = isCelsius ? `${base} (°C)` : `${base} (°F)`;
     this.chart.update();
   }
 
