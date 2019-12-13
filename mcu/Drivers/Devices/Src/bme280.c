@@ -1544,7 +1544,7 @@ void BME280_ToJson_Partial(char *buffer)
 {
 	memset(buffer, 0, BME280_JSON_LENGTH);
 	snprintf(buffer, BME280_JSON_LENGTH,
-			 "\"BME280\":{\"T_C\":%.2f,\"T_F\":%.2f,\"RH\":%.2f,\"P\":%.2f,\"P_kPa\":%.1f,\"P_mb\":%d}",
+			 "\"BME280\":{\"T_C\":%.2f,\"T_F\":%.2f,\"RH\":%.2f,\"P\":%.2f,\"P_kPa\":%.2f,\"P_mb\":%d}",
 			 comp_data.temperature, to_fahrenheit(comp_data.temperature),
 			 comp_data.humidity, comp_data.pressure, comp_data.pressure*0.001, (int)(round(comp_data.pressure*0.01)));
 }

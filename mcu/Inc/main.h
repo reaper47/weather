@@ -33,6 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdio.h>
 #include "core.h"
 /* USER CODE END Includes */
 
@@ -55,7 +56,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-//void sample_and_post_dht(char *endpoint);
+void SleepMode_LeaveGpioOn(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -86,6 +87,9 @@ void Error_Handler(void);
 #define BME280_SDA_Pin GPIO_PIN_7
 #define BME280_SDA_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
+#define PROGRAM_STARTED "\r\nProgram Started\r\n"
+#define PROGRAM_READY "Weather station ready\r\n"
+
 #define COUNTER_GRAPH_SAMPLE_SECONDS 900
 #define COUNTER_LIVE_SAMPLE_SECONDS  21
 

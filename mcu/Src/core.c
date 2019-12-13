@@ -57,8 +57,12 @@ void sample_and_post(char *endpoint, bool *is_conversion_completed)
 	BME280_ToJson_Partial(json_bme280);
 
 	Temperature_t average_temperature;
-	average_temperature.celsius = (DHT_GetTemperature(true) + BME280_GetTemperature(true) + ds18b20_temperatures[0].celsius)/3;
-	average_temperature.fahrenheit = (DHT_GetTemperature(false) + BME280_GetTemperature(false) + ds18b20_temperatures[0].fahrenheit)/3;
+	average_temperature.celsius = (DHT_GetTemperature(true) + \
+								   BME280_GetTemperature(true) + \
+								   ds18b20_temperatures[0].celsius)/3;
+	average_temperature.fahrenheit = (DHT_GetTemperature(false) + \
+									  BME280_GetTemperature(false) + \
+									  ds18b20_temperatures[0].fahrenheit)/3;
 
 	// Send HTTP Header
 	memset(json, 0, sizeof json);

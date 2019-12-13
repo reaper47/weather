@@ -2,6 +2,7 @@
 
 TEMT600_t temt600;
 
+
 void TEMT600_Init()
 {
 	temt600.percentage_brightness = 0.0;
