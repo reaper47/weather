@@ -14,7 +14,7 @@
           </tr>
         </thead>
         <tbody>
-          {%- for component in ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'] -%}
+          {%- for component in ['temperature', 'heat-index', 'humidity', 'wind', 'lux', 'rain', 'pressure'] -%}
           <tr>
             <td>{{ component|title|replace('-', ' ') }}</td>
             <td>
@@ -54,6 +54,20 @@
                 <select id="pressure-unit">
                 {%- for val, label in [('pascal', 'Pascal (Pa)'), ('kilopascal', 'Kilopascal (kPa)'),
                                        ('mbar', 'Millibar (mbar)')] -%}
+                  <option value="{{ val }}">{{ label }}</option>
+                {%- endfor -%}
+                </select>
+                <label for="pressure-unit"></label>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td>Pressure</td>
+            <td>
+              <div class="field">
+                <select id="wind-unit">
+                {%- for val, label in [('ms', 'Meters/Second (m/s)'), ('kmph', 'Kilometers/Hour (kmph)'),
+                                       ('mph', 'Miles/Hour (mph)')] -%}
                   <option value="{{ val }}">{{ label }}</option>
                 {%- endfor -%}
                 </select>

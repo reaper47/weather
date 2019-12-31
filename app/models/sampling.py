@@ -220,6 +220,29 @@ class BME280(db.Model):
                 f'  Date: {self.date}>')
 
 
+class Wind(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    ms = db.Column(db.Float, nullable=False)
+    kmph = db.Column(db.Float, nullable=False)
+    mph = db.Column(db.Float, nullable=False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __eq__(self, other):
+        return ((self.ms - other.ms) <= 0.001 and
+                (self.kmph - other.kmph) <= 0.001 and
+                (self.mph - other.mph) <= 0.001 and
+                str(self.date) == str(other.date))
+
+    def __hash__(self):
+        return hash(self.date)
+
+    def __repr__(self):
+        return (f'<Wind #{self.id} -\n'
+                f'  m/s: {self.ms}\n'
+                f'  km/h: {self.kmph}\n'
+                f'  mph: {self.mph}>')
+
+
 class Averages(db.Model):
     __tablename__ = 'averages'
 
@@ -239,6 +262,7 @@ def get_samples_for_day(date):
         'FC37': {'Rain': []},
         'TEMT6000': {'Light': []},
         'BME280': {'T_C': [], 'T_F': [], 'RH': [], 'P_Pa': [], 'P_kPa': [], 'P_mb': []},
+        'Wind': {'ms': [], 'kmph': [], 'mph': []},
         'Averages': {'T_C': [], 'T_F': []},
         'dates': []
     }
@@ -270,6 +294,11 @@ def get_samples_for_day(date):
     data['BME280']['P_kPa'] = [x.pressure.kilopascal for x in samples]
     data['BME280']['P_mb'] = [x.pressure.mbar for x in samples]
 
+    samples = Wind.query.filter(Wind.date.between(day_start, day_end)).all()
+    data['Wind']['ms'] = [x.ms for x in samples]
+    data['Wind']['kmph'] = [x.kmph for x in samples]
+    data['Wind']['mph'] = [x.mph for x in samples]
+
     samples = Averages.query.filter(Averages.date.between(day_start, day_end)).all()
     data['Averages']['T_C'] = [x.temperature.celsius for x in samples]
     data['Averages']['T_F'] = [x.temperature.fahrenheit for x in samples]
@@ -293,10 +322,12 @@ def add_new_sample(sample: Sample):
     p = find_pressure(sample.bme280.pa, sample.bme280.kpa, sample.bme280.mb)
     bme280 = BME280(temperature=t, humidity=sample.bme280.humidity, pressure=p, date=sample.date)
 
+    wind = Wind(ms=sample.wind.ms, kmph=sample.wind.kmph, mph=sample.wind.mph, date=sample.date)
+
     t = find_temperature(Temperature, sample.averages.t_c, sample.averages.t_f)
     averages = Averages(temperature=t, date=sample.date)
 
-    commit([dht, ds18b20, fc37, temt6000, bme280, averages])
+    commit([dht, ds18b20, fc37, temt6000, bme280, wind, averages])
 
 
 def find_temperature(Entity, celsius, fahrenheit):

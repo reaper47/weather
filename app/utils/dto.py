@@ -44,11 +44,19 @@ class Averages_Dto:
 
 
 @dataclass
+class Wind_Dto:
+    ms: float
+    kmph: float
+    mph: float
+
+
+@dataclass
 class Sample:
     dht: DHT_Dto
     ds18b20: DS18B20_Dto
     fc37: FC37_Dto
     temt6000: TEMT6000_Dto
     bme280: BME280_Dto
+    wind: Wind_Dto
     averages: Averages_Dto
     date: str

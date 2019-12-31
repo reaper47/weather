@@ -26,12 +26,14 @@ def test_send_current_samples_to_template(mock_get_samples, test_client):
 
 @mock.patch(MOCK_REQUEST)
 @mock.patch(MOCK_ADD_NEW_SAMPLE)
-def test_newsample_add_new_sample_called(mock_add_new_sample, mock_request, test_client):
+def test_newsample_add_new_sample_called(mock_add_new_sample,
+                                         mock_request, test_client):
     """
     WHEN posting sensor data to newsample
     THEN the json sample received is added to the db
     """
-    test_client.post('/newsample', data=A_JSON_SAMPLE, content_type='application/json')
+    test_client.post('/newsample', data=A_JSON_SAMPLE,
+                     content_type='application/json')
 
     assert mock_add_new_sample.called
 
@@ -39,13 +41,15 @@ def test_newsample_add_new_sample_called(mock_add_new_sample, mock_request, test
 @mock.patch(MOCK_REQUEST)
 @mock.patch(MOCK_ADD_NEW_SAMPLE)
 @mock.patch(MOCK_SOCKETIO_EMIT)
-def test_newsample_send_message(mock_socketio, mock_add_new_sample, mock_request, test_client):
+def test_newsample_send_message(mock_socketio, mock_add_new_sample,
+                                mock_request, test_client):
     """
     WHEN posting sensor data to newsample
     THEN a SocketIO message is sent to the client
     """
     mock_add_new_sample.return_value = []
-    test_client.post('/newsample', data=A_JSON_SAMPLE, content_type='application/json')
+    test_client.post('/newsample', data=A_JSON_SAMPLE,
+                     content_type='application/json')
 
     assert mock_socketio.emit.called
 
@@ -70,6 +74,7 @@ def test_livesample_send_message(mock_socketio, mock_request, test_client):
     WHEN posting sensor data to newsample
     THEN a SocketIO message is sent to the client
     """
-    test_client.post('/livesample', data=A_JSON_SAMPLE, content_type='application/json')
+    test_client.post('/livesample', data=A_JSON_SAMPLE,
+                     content_type='application/json')
 
     assert mock_socketio.emit.called

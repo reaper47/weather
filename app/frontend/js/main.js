@@ -1,6 +1,9 @@
 const PressureUnitsEnum = Object.freeze({'pascal': 0, 'kilopascal': 1, 'mbar': 2});
+const WindUnitsEnum = Object.freeze({'ms': 0, 'kmph': 1, 'mph': 2});
+
 const liveJson = 'liveTiles';
 const unitsJson = 'units';
+
 var liveCharts;
 
 function main(samples, socketAddress) {
@@ -13,6 +16,7 @@ function main(samples, socketAddress) {
     'Light': document.getElementById('live-lux'),
     'Rain': document.getElementById('live-rain'),
     'P': document.getElementById('live-pressure'),
+    'Wind': document.getElementById('live-wind')
   }
 
   liveCharts = new LiveCharts(samples, liveTiles);
@@ -46,7 +50,7 @@ function main(samples, socketAddress) {
 
 
 function loadLiveSettings() {
-  const liveTiles = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure'];
+  const liveTiles = ['temperature', 'heat-index', 'humidity', 'lux', 'rain', 'pressure', 'wind'];
 
   if (window.localStorage.getItem(liveJson)) {
     updateLiveSettings(liveTiles);
@@ -69,6 +73,7 @@ function saveLiveSettings(tiles) {
   json = {};
   json['P'] = document.getElementById('pressure-unit').value;
   json['isCelsius'] = document.getElementById('temperature-unit').value.includes('celsius');
+  json['wind'] = document.getElementById('wind-unit').value;
   window.localStorage.setItem(unitsJson, JSON.stringify(json));
   updateUnits();
 }
@@ -78,15 +83,19 @@ function updateUnits() {
   const json = JSON.parse(window.localStorage.getItem(unitsJson));
   const temperatureUnit = document.getElementById('temperature-unit');
   const pressureUnit = document.getElementById('pressure-unit');
+  const windUnit = document.getElementById('wind-unit');
 
   if (json) {
     temperatureUnit.selectedIndex = json['isCelsius'] ? 0 : 1;
     pressureUnit.selectedIndex = PressureUnitsEnum[json['P']];
+    windUnit.selectedIndex = WindUnitsEnum[json['wind']];
     liveCharts.updateTemperatureUnit(json['isCelsius']);
     liveCharts.updatePressureUnit(pressureUnit.value);
+    liveCharts.updateWindUnit(windUnit.value);
   } else {
     temperatureUnit.selectedIndex = 0;
     pressureUnit.selectedIndex = 0;
+    windUnit.selectedIndex = 0;
   }
 }
 
@@ -131,23 +140,56 @@ function updateLiveTiles(tiles) {
 
 
 function updateLiveSettings(tiles) {
-  const json = JSON.parse(window.localStorage.getItem(liveJson));
-  const radios = tiles.map(el => document.getElementById(`display-${el}`));
-  for (let key in json) {
-    const i = tiles.indexOf(key);
-    radios[i].checked = json[key];
-  }
+    const json = JSON.parse(window.localStorage.getItem(liveJson));
+    const radios = tiles.map(el => document.getElementById(`display-${el}`));
+
+    for (let key in json) {
+        const i = tiles.indexOf(key);
+        radios[i].checked = json[key];
+    }
 }
 
 
 function refreshAtMidnightTimer() {
-  (function loop() {
-    let now = new Date();
-    const minutes = now.getMinutes();
-    if (now.getHours() === 0 && minutes >= 0 && minutes <= 10)
-      location.reload();
-    now = new Date();
-    const delay = 450000 - (now % 450000);
-    setTimeout(loop, delay);
-  })();
+    (function loop() {
+        const now = new Date();
+        const date = now.getDate();
+
+        const refreshDay = getCookie('liveRefresh');
+        if (refreshDay) {
+            if (refreshDay == date - 1) {
+                location.reload();
+                createCookie('liveRefresh', date, 1);
+            }
+        } else {
+            createCookie('liveRefresh', date, 1);
+        }
+
+        const delay = 450000 - (now % 450000);
+        setTimeout(loop, delay);
+    })();
+}
+
+
+function createCookie(name, value, days) {
+    let expires = '';
+    if (days) {
+        const date = new Date();
+        date.setTime(date.getTime() + (days*24*3600*1000));
+        expires = `; expires=${date.toUTCString()}`;
+    }
+    document.cookie = `${name}=${value}${expires}; path=/`;
+}
+
+
+function getCookie(name) {
+    if (document.cookie.length > 0) {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const parts = cookie.split('=');
+            if (parts[0].trimStart().localeCompare(name) === 0)
+                return parts[1];
+        }
+    }
+    return false;
 }

@@ -123,6 +123,28 @@ class LiveChart {
     this.chart.update();
   }
 
+  changeWindUnit(samples, isy1, newlabel, unit) {
+    const i = isy1 ? 0 : 1;
+    this.__config.data.datasets[i].data = samples;
+    this.__config.options.scales.yAxes[i].scaleLabel.labelString = newlabel;
+
+    let ticks = this.__config.options.scales.yAxes[i].ticks;
+    if (ticks.hasOwnProperty('suggestedMin')) {
+      if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('m/s')) {
+        ticks.suggestedMin = 0;
+        ticks.suggestedMax = 32;
+      } else if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('km/h')) {
+        ticks.suggestedMin = 0;
+        ticks.suggestedMax = 110;
+      } else {
+        ticks.suggestedMin = 0;
+        ticks.suggestedMax = 68;
+      }
+    }
+
+    this.chart.update();
+  }
+
   show() {
     this.__container.classList.remove('hide')
   }

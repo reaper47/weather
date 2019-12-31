@@ -21,7 +21,8 @@ class LiveCharts {
       'Light_RH': new LiveChart_Light_RH('live-chart-light-humidity', data.dates, data.TEMT6000.Light, data.DHT.RH),
       'P_RH': new LiveChart_P_RH('live-chart-pressure-humidity', data.dates, data.BME280.P, data.DHT.RH),
       'P_Rain': new LiveChart_P_Rain('live-chart-pressure-rain', data.dates, data.BME280.P, data.FC37.Rain),
-      'P_Light': new LiveChart_P_Light('live-chart-pressure-light', data.dates, data.BME280.P, data.TEMT6000.Light)
+      'P_Light': new LiveChart_P_Light('live-chart-pressure-light', data.dates, data.BME280.P, data.TEMT6000.Light),
+      'W': new LiveChart_W('live-chart-wind', data.dates, data.Wind.ms),
     };
 
     this.data = data;
@@ -29,6 +30,7 @@ class LiveCharts {
     this.sample = null;
     this.isCelsius = true;
     this.pressureUnit = PressureUnitsEnum.pascal;
+    this.windUnit = WindUnitsEnum.ms;
     this.dates = data['dates'];
 
     this.temperatureSelectContainer = document.getElementById('live-sensors-temperature');
@@ -39,6 +41,7 @@ class LiveCharts {
       'temperature': this.charts['T'],
       'heat-index': this.charts['HI'],
       'humidity': this.charts['RH'],
+      'wind': this.charts['W'],
       'rain': this.charts['Rain'],
       'light': this.charts['Light'],
       'pressure': this.charts['P'],
@@ -137,12 +140,14 @@ class LiveCharts {
       'RH': this.__getHumiditySensorSample(sample),
       'rain': sample.FC37.rain,
       'light': sample.TEMT6000.lux,
-      'P': this.__getPressureSensorSample(sample)
+      'P': this.__getPressureSensorSample(sample),
+      'wind': this.__getWindSample(sample)
     };
 
     this.charts['T'].addDataPoint(date_, vals.T),
     this.charts['HI'].addDataPoint(date_, vals.HI),
     this.charts['RH'].addDataPoint(date_, vals.RH),
+    this.charts['W'].addDataPoint(date_, vals.wind),
     this.charts['Rain'].addDataPoint(date_, vals.rain),
     this.charts['Light'].addDataPoint(date_, vals.light),
     this.charts['P'].addDataPoint(date_, vals.P),
@@ -210,13 +215,23 @@ class LiveCharts {
     return sample.BME280.P_mb;
   }
 
+  __getWindSample(sample) {
+    if (this.windUnit === WindUnitsEnum.ms)
+      return sample.Wind.ms;
+    else if (this.windUnit === WindUnitsEnum.kmph)
+      return sample.Wind.kmph;
+    return sample.Wind.mph;
+  }
+
   updateLive(new_sample) {
     this.sample = new_sample;
     this.updateLiveTemperature();
     this.liveTiles['RH'].textContent = `${this.sample.DHT.RH}%`;
     this.liveTiles['Light'].textContent = `${this.sample.TEMT6000.lux}`;
     this.liveTiles['Rain'].textContent = `${this.labelRain(this.sample.FC37.rain)}`;
+    this.updateLiveWind();
     this.updateLivePressure();
+
   }
 
   labelRain(char) {
@@ -246,11 +261,20 @@ class LiveCharts {
 
   updateLivePressure() {
     if (this.pressureUnit === PressureUnitsEnum.pascal)
-      this.liveTiles['P'].textContent = `${this.numberWithCommas(this.sample.BME280.P.toFixed(0))} Pa`;
+      this.liveTiles['P'].textContent = `${this.numberWithCommas(this.sample.BME280.P.toFixed(0))}` + ' Pa';
     else if (this.pressureUnit === PressureUnitsEnum.kilopascal)
-      this.liveTiles['P'].textContent = `${this.sample.BME280.P_kPa} kPa`;
+      this.liveTiles['P'].textContent = `${this.sample.BME280.P_kPa}` + ' kPa';
     else
-      this.liveTiles['P'].textContent = `${this.sample.BME280.P_mb} mbar`;
+      this.liveTiles['P'].textContent = `${this.sample.BME280.P_mb}` + ' mbar';
+  }
+
+  updateLiveWind() {
+    if (this.windUnit === WindUnitsEnum.ms)
+      this.liveTiles['Wind'].textContent = `${this.numberWithCommas(this.sample.Wind.ms)}` + ' m/s';
+    else if (this.windUnit === WindUnitsEnum.kmph)
+      this.liveTiles['Wind'].textContent = `${this.sample.Wind.kmph}` + ' km/h';
+    else
+      this.liveTiles['Wind'].textContent = `${this.sample.Wind.mph}` + ' mph';
   }
 
   updateTemperatureUnit(isCelsius) {
@@ -273,7 +297,7 @@ class LiveCharts {
     this.pressureUnit = PressureUnitsEnum[unit];
 
     if (this.sample)
-      this.updateLivePressure()
+      this.updateLivePressure();
 
     let samples;
     let newlabel = 'Pressure ';
@@ -289,10 +313,34 @@ class LiveCharts {
     }
 
     const charts1 = ['P', 'P_RH', 'P_Light', 'P_Rain'];
-    charts1.forEach(chart => this.charts[chart].changePressureUnit(samples, true, newlabel, this.pressureUnit));
+    charts1.forEach(chart => this.charts[chart].changePressureUnit(samples, true, newlabel, unit));
 
     const charts2 = ['T_P', 'HI_P'];
-    charts2.forEach(chart => this.charts[chart].changePressureUnit(samples, false, newlabel, this.pressureUnit));
+    charts2.forEach(chart => this.charts[chart].changePressureUnit(samples, false, newlabel, unit));
+  }
+
+  updateWindUnit(unit) {
+    this.windUnit = WindUnitsEnum[unit];
+
+    if (this.sample)
+      this.updateLiveWind();
+
+    let samples;
+    let newlabel = 'Wind Speed ';
+
+    if (this.windUnit === WindUnitsEnum.ms) {
+      samples = this.data.Wind.ms;
+      newlabel += '(m/s)';
+    } else if (this.windUnit === WindUnitsEnum.kmph) {
+      samples = this.data.Wind.kmph;
+      newlabel += '(km/h)';
+    } else {
+      samples = this.data.Wind.mph;
+      newlabel += '(mph)';
+    }
+
+    const charts1 = ['W'];
+    charts1.forEach(chart => this.charts[chart].changeWindUnit(samples, true, newlabel, unit));
   }
 
   zoomChart(zoomButton) {

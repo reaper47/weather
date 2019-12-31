@@ -7,7 +7,7 @@
       <div class="tile">
         <div id="live-tile" class="tile is-parent is-2  is-vertical no-padding">
           {%- for x in [('is-primary', 'Temperature'), ('is-danger', 'Heat Index'), ('is-link', 'Humidity'),
-                       ('is-warning', 'Lux'), ('is-info', 'Rain'), ('is-light', 'Pressure')] -%}
+                       ('is-black', 'Wind'), ('is-warning', 'Lux'), ('is-info', 'Rain'), ('is-light', 'Pressure')] -%}
           <article id="live-container-{{ '-'.join(x[1].split(' '))|lower }}" class="tile is-child notification {{ x[0] }} sensor-data-container">
             <p id="live-{{ '-'.join(x[1].split(' '))|lower }}" class="title sensor-data">N/A</p>
             <p class="title">{{ x[1] }}</p>
@@ -16,7 +16,7 @@
         </div>
         <div id="live-graph" class="tile is-parent is-10 no-padding">
           <article class="tile is-child notification is-dark">
-            {%- for x in ('temperature', 'temperature-humidity', 'humidity', 'heat-index',
+            {%- for x in ('temperature', 'temperature-humidity', 'humidity', 'wind', 'heat-index',
                          'temperature-heat-index', 'heat-index-humidity', 'rain', 'light',
                          'temperature-rain', 'temperature-light', 'heat-index-rain', 'heat-index-light',
                          'rain-humidity', 'rain-light', 'light-humidity', 'pressure', 'temperature-pressure',

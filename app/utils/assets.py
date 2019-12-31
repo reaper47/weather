@@ -41,5 +41,6 @@ bundles = {
                       f'{JS}/charts/LiveChart_P_RH.js',
                       f'{JS}/charts/LiveChart_P_Rain.js',
                       f'{JS}/charts/LiveChart_P_Light.js',
+                        f'{JS}/charts/LiveChart_W.js',
                       filters='jsmin', output='gen/packed.js')
 }
