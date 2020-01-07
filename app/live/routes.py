@@ -22,8 +22,6 @@ graphs = ['temperature', 'heat-index', 'humidity', 'wind', 'rain', 'light', 'pre
 @bp.route('/', methods=['GET', 'POST'])
 def index():
     samples = get_samples_for_day(datetime.now())
-    import pprint as p
-    p.pprint(samples)
     return render_template('index.html', title='Live',
                            samples=samples, graphs=graphs)
 
