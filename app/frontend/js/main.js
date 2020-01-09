@@ -28,11 +28,7 @@ function main(samples, socketAddress) {
   socket.on('update_live', sample => liveCharts.updateLive(sample));
 
   // Event listeners
-  refreshAtMidnightTimer();
-
   const liveChartSelect = document.getElementById('live-chart-select');
-  liveChartSelect.selectedIndex = 0;
-  liveChartSelect.addEventListener('change', opt => liveCharts.changeChart(opt.target.value, liveZoomButton));
 
   const liveSensorsTemperatureSelect = document.getElementById('live-sensors-temperature').firstElementChild;
   liveSensorsTemperatureSelect.addEventListener('change', opt => liveCharts.changeSensorT(opt.target.value));
@@ -45,6 +41,17 @@ function main(samples, socketAddress) {
   liveSensorsHumiditySelect.selectedIndex = 0;
   liveZoomButton.addEventListener('mousedown', click => liveCharts.zoomChart(click.target));
 
+  liveChartSelect.addEventListener('change', opt => liveCharts.changeChart(opt.target.value, liveZoomButton));
+
+  refreshAtMidnightTimer();
+
+  // Select last live graph
+  liveChartSelect.selectedIndex = 0;
+  const index = getCookie('liveGraphSelected');
+  liveChartSelect.selectedIndex = index === null ? 0 : index;
+  liveCharts.changeChart(liveChartSelect.value, liveZoomButton)
+
+  // Load Settings
   loadLiveSettings();
 }
 
@@ -147,6 +154,12 @@ function updateLiveSettings(tiles) {
         const i = tiles.indexOf(key);
         radios[i].checked = json[key];
     }
+}
+
+
+function saveSelectedLiveGraph() {
+    const liveChartSelect = document.getElementById('live-chart-select');
+    createCookie('liveGraphSelected', liveChartSelect.selectedIndex, 0);
 }
 
 
