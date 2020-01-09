@@ -41,7 +41,7 @@ class LiveChart_HI_Light extends LiveChart {
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               suggestedMin: 0,
-              suggestedMax: 100,
+              suggestedMax: 50,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -80,6 +80,6 @@ class LiveChart_HI_Light extends LiveChart {
   }
 
   unzoom() {
-    super.unzoom(0, 100, true, 0, 1000);
+    super.unzoom(0, 50, true, 0, 1000);
   }
 }

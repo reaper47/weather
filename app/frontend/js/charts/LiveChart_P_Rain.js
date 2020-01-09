@@ -42,8 +42,8 @@ class LiveChart_P_Rain extends LiveChart {
             },
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
-              suggestedMin: 90000,
-              suggestedMax: 110000,
+              suggestedMin: 96000,
+              suggestedMax: 106000,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -88,10 +88,10 @@ class LiveChart_P_Rain extends LiveChart {
 
   unzoom() {
     if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('mbar'))
-      super.unzoom(900, 1100, true, 0, 4);
+      super.unzoom(960, 1060, true, 0, 4);
     else if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('kPa'))
-      super.unzoom(90, 110, true, 0, 4);
+      super.unzoom(96, 106, true, 0, 4);
     else
-      super.unzoom(90000, 110000, true, 0, 4);
+      super.unzoom(96000, 106000, true, 0, 4);
   }
 }

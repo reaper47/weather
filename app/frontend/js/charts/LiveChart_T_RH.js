@@ -38,7 +38,7 @@ class LiveChart_T_RH extends LiveChart {
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               suggestedMin: 0,
-              suggestedMax: 100,
+              suggestedMax: this.suggestedMaxT,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -79,6 +79,6 @@ class LiveChart_T_RH extends LiveChart {
   }
 
   unzoom() {
-    super.unzoom(0, 100, true, 0, 100);
+    super.unzoom(0, this.suggestedMaxT, true, 0, 100);
   }
 }

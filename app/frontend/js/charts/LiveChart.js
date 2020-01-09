@@ -3,6 +3,7 @@ class LiveChart {
     this.__container = document.getElementById(liveChartID + '__container');
     this.__liveChartID = liveChartID;
     this.__ctx = document.getElementById(liveChartID).getContext('2d');
+    this.suggestedMaxT = 50;
   }
 
   __baseConfig() {
@@ -103,20 +104,21 @@ class LiveChart {
 
   changePressureUnit(samples, isy1, newlabel, unit) {
     const i = isy1 ? 0 : 1;
+
     this.__config.data.datasets[i].data = samples;
     this.__config.options.scales.yAxes[i].scaleLabel.labelString = newlabel;
 
     let ticks = this.__config.options.scales.yAxes[i].ticks;
     if (ticks.hasOwnProperty('suggestedMin')) {
       if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('mbar')) {
-        ticks.suggestedMin = 900;
-        ticks.suggestedMax = 1100;
+        ticks.suggestedMin = 960;
+        ticks.suggestedMax = 1060;
       } else if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('kPa')) {
-        ticks.suggestedMin = 90;
-        ticks.suggestedMax = 110;
+        ticks.suggestedMin = 96;
+        ticks.suggestedMax = 106;
       } else {
-        ticks.suggestedMin = 90000;
-        ticks.suggestedMax = 110000;
+        ticks.suggestedMin = 96000;
+        ticks.suggestedMax = 106000;
       }
     }
 
@@ -132,13 +134,13 @@ class LiveChart {
     if (ticks.hasOwnProperty('suggestedMin')) {
       if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('m/s')) {
         ticks.suggestedMin = 0;
-        ticks.suggestedMax = 32;
+        ticks.suggestedMax = 8;
       } else if (this.__config.options.scales.yAxes[i].scaleLabel.labelString.includes('km/h')) {
         ticks.suggestedMin = 0;
-        ticks.suggestedMax = 110;
+        ticks.suggestedMax = 30;
       } else {
         ticks.suggestedMin = 0;
-        ticks.suggestedMax = 68;
+        ticks.suggestedMax = 20;
       }
     }
 

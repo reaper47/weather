@@ -52,8 +52,7 @@
             <td>
               <div class="field">
                 <select id="pressure-unit">
-                {%- for val, label in [('pascal', 'Pascal (Pa)'), ('kilopascal', 'Kilopascal (kPa)'),
-                                       ('mbar', 'Millibar (mbar)')] -%}
+                {%- for val, label in [('pascal', 'Pascal (Pa)'), ('kilopascal', 'Kilopascal (kPa)'), ('mbar', 'Millibar (mbar)')] -%}
                   <option value="{{ val }}">{{ label }}</option>
                 {%- endfor -%}
                 </select>
@@ -62,16 +61,15 @@
             </td>
           </tr>
           <tr>
-            <td>Pressure</td>
+            <td>Wind Speed</td>
             <td>
               <div class="field">
                 <select id="wind-unit">
-                {%- for val, label in [('ms', 'Meters/Second (m/s)'), ('kmph', 'Kilometers/Hour (kmph)'),
-                                       ('mph', 'Miles/Hour (mph)')] -%}
+                {%- for val, label in [('ms', 'Meters/Second (m/s)'), ('kmph', 'Kilometers/Hour (kmph)'), ('mph', 'Miles/Hour (mph)')] -%}
                   <option value="{{ val }}">{{ label }}</option>
                 {%- endfor -%}
                 </select>
-                <label for="pressure-unit"></label>
+                <label for="wind-unit"></label>
               </div>
             </td>
           </tr>

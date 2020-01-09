@@ -39,7 +39,7 @@ class LiveChart_HI_P extends LiveChart {
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               maxTicksLimit: 20,
-              suggestedMax: 100,
+              suggestedMax: this.suggestedMaxT,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -49,8 +49,6 @@ class LiveChart_HI_P extends LiveChart {
           },
           {
             id: 'Pressure',
-            min: 0,
-            max: 100,
             scaleLabel: {
               display: true,
               labelString: 'Pressure (Pa)',
@@ -60,8 +58,8 @@ class LiveChart_HI_P extends LiveChart {
             },
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
-              suggestedMin: 90000,
-              suggestedMax: 110000,
+              suggestedMin: 96000,
+              suggestedMax: 106000,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -80,11 +78,11 @@ class LiveChart_HI_P extends LiveChart {
   }
   
   unzoom() {
-    if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('mbar'))
-      super.unzoom(0, 100, true, 900, 1100);
-    else if (this.__config.options.scales.yAxes[0].scaleLabel.labelString.includes('kPa'))
-      super.unzoom(0, 100, true, 90, 110);
+    if (this.__config.options.scales.yAxes[1].scaleLabel.labelString.includes('mbar'))
+      super.unzoom(0, this.suggestedMaxT, true, 960, 1060);
+    else if (this.__config.options.scales.yAxes[1].scaleLabel.labelString.includes('kPa'))
+      super.unzoom(0, this.suggestedMaxT, true, 96, 106);
     else
-      super.unzoom(0, 100, true, 90000, 110000);
+      super.unzoom(0, this.suggestedMaxT, true, 96000, 106000);
   }
 }

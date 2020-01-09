@@ -41,7 +41,7 @@ class LiveChart_T_P extends LiveChart {
             ticks: {
               fontColor: 'rgba(255, 255, 255, 0.7)',
               suggestedMin: 0,
-              suggestedMax: 100,
+              suggestedMax: this.suggestedMaxT,
             },
             gridLines: {
               color: 'rgba(255, 255, 255, 0.25)',
@@ -59,8 +59,8 @@ class LiveChart_T_P extends LiveChart {
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             ticks: {
-              suggestedMin: 90000,
-              suggestedMax: 110000,
+              suggestedMin: 96000,
+              suggestedMax: 106000,
               fontColor: 'rgba(255, 255, 255, 0.7)',
             },
             gridLines: {
@@ -81,10 +81,10 @@ class LiveChart_T_P extends LiveChart {
 
   unzoom() {
     if (this.__config.options.scales.yAxes[1].scaleLabel.labelString.includes('mbar'))
-      super.unzoom(0, 100, true, 900, 1100);
+      super.unzoom(0, this.suggestedMaxT, true, 960, 1060);
     else if (this.__config.options.scales.yAxes[1].scaleLabel.labelString.includes('kPa'))
-      super.unzoom(0, 100, true, 90, 110);
+      super.unzoom(0, this.suggestedMaxT, true, 96, 106);
     else
-      super.unzoom(0, 100, true, 90000, 110000);
+      super.unzoom(0, this.suggestedMaxT, true, 96000, 106000);
   }
 }
