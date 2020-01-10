@@ -48,7 +48,7 @@ function main(samples, socketAddress) {
   // Select last live graph
   liveChartSelect.selectedIndex = 0;
   const index = getCookie('liveGraphSelected');
-  liveChartSelect.selectedIndex = index === null ? 0 : index;
+  liveChartSelect.selectedIndex = index === Number.MIN_VALUE ? 0 : index;
   liveCharts.changeChart(liveChartSelect.value, liveZoomButton)
 
   // Load Settings
@@ -169,10 +169,10 @@ function refreshAtMidnightTimer() {
         const date = now.getDate();
 
         const refreshDay = getCookie('liveRefresh');
-        if (refreshDay) {
-            if (refreshDay == date - 1) {
-                location.reload();
+        if (refreshDay !== Number.MIN_VALUE) {
+            if (Number(refreshDay) === date - 1) {
                 createCookie('liveRefresh', date, 1);
+                location.reload();
             }
         } else {
             createCookie('liveRefresh', date, 1);
@@ -204,5 +204,5 @@ function getCookie(name) {
                 return parts[1];
         }
     }
-    return false;
+    return Number.MIN_VALUE;
 }
