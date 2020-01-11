@@ -21,3 +21,7 @@ html {
 select {
   height: 2rem;
 }
+
+.tile.is-ancestor {
+  margin-top: 0 !important;
+}

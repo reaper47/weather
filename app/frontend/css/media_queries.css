@@ -1,9 +1,19 @@
+@media all and (min-width: 768px) {
+  .height100 {
+    height: 100vh !important;
+  }
+  .height102 {
+    height: 102vh;
+  }
+}
+
+
 @media screen and (max-width: 768px) {
   html {
     overflow-y: visible !important;
     overflow-x: hidden !important;
   }
-  
+
   #live-chart__container {
     width: 96vw;
   }

@@ -42,7 +42,9 @@ function main(samples, socketAddress) {
   liveZoomButton.addEventListener('mousedown', click => liveCharts.zoomChart(click.target));
 
   liveChartSelect.addEventListener('change', opt => liveCharts.changeChart(opt.target.value, liveZoomButton));
+  document.getElementById('live-fullscreen').addEventListener('change', liveFullScreen);
 
+  liveGraphKeysListener();
   refreshAtMidnightTimer();
 
   // Select last live graph
@@ -53,6 +55,25 @@ function main(samples, socketAddress) {
 
   // Load Settings
   loadLiveSettings();
+}
+
+
+function liveGraphKeysListener() {
+    document.addEventListener('keydown', (event) => {
+        if (event.code === 'KeyF') {
+            liveFullScreen();
+
+            const fullscreenInput = document.getElementById('live-fullscreen');
+            fullscreenInput.checked = 1 - fullscreenInput.checked;
+        }
+    });
+}
+
+
+function liveFullScreen() {
+    document.getElementsByTagName('nav')[0].classList.toggle('hide');
+    document.getElementById('live-tile').classList.toggle('height102');
+    document.getElementsByTagName('canvas')[0].classList.toggle('height100');
 }
 
 
